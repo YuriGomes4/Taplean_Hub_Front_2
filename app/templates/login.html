@@ -191,14 +191,35 @@
             if (xhr.status === 201) {
               // Requisição bem sucedida
               //console.error(xhr.responseText);
-                var responseJson = JSON.parse(xhr.responseText); // Parse the response as JSON
-                var token = responseJson.token; // Get the value of 'token'
-                document.cookie = "token=" + token; // Set the cookie
-                window.location.href = "/graficos";
+              var responseJson = JSON.parse(xhr.responseText); // Parse the response as JSON
+              var token = responseJson.token; // Get the value of 'token'
+              document.cookie = "token=" + token; // Set the cookie
+
+              var xhr2 = new XMLHttpRequest();
+              xhr2.open("GET", "http://localhost:5000/api/v1/usuario/preferences", true);
+              xhr2.setRequestHeader("x-access-token", token);
+              xhr2.onreadystatechange = function() {
+                if (xhr2.readyState === 4) {
+                  if (xhr2.status === 200) {
+                    // Requisição bem sucedida
+                    //console.error(xhr.responseText);
+                    var responseJson = JSON.parse(xhr2.responseText); // Parse the response as JSON
+                    var prefs = responseJson.result; // Get the value of 'token'
+                    document.cookie = "prefs=" + prefs; // Set the cookie
+                  } else {
+                    // Ocorreu um erro na requisição
+                    console.error('Erro:', xhr2.status);
+                    // console.error(xhr.responseText);
+                  }
+                }
+              };
+              xhr2.send();
+              
+              window.location.href = "/graficos";
             } else {
-              // Ocorreu um erro na requisição
-              console.error('Erro:', xhr.status);
-              // console.error(xhr.responseText);
+            // Ocorreu um erro na requisição
+            console.error('Erro:', xhr.status);
+            // console.error(xhr.responseText);
             }
           }
         };

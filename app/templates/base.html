@@ -8,111 +8,117 @@
     {% block head %}{% endblock %}
   </head>
   <body>
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-        <span class="fs-4">Sidebar</span>
-      </a>
-      <hr>
-      <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-          {% if pagina == 'graficos' %}
-            <a href="/graficos" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-              Gráficos
-            </a>
-          {% else %}
-            <a href="/graficos" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-              Gráficos
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          {% if pagina == 'produtos' %}
-            <a href="/produtos" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-              Produtos
-            </a>
-          {% else %}
-            <a href="/produtos" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-              Produtos
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          {% if pagina == 'anuncios' %}
-            <a href="/anuncios" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-              Anúncios
-            </a>
-          {% else %}
-            <a href="/anuncios" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-              Anúncios
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          {% if pagina == 'analise_mercado' %}
-            <a href="/analise_mercado" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-              Análise de mercado
-            </a>
-          {% else %}
-            <a href="/analise_mercado" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-              Análise de mercado
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          {% if pagina == 'conta' %}
-            <a href="/conta" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-              Conta
-            </a>
-          {% else %}
-            <a href="/conta" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-              Conta
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          {% if pagina == 'administracao' %}
-            <a href="/administracao" class="nav-link active">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-              Administração
-            </a>
-          {% else %}
-            <a href="/administracao" class="nav-link text-white">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-              Administração
-            </a>
-          {% endif %}
-        </li>
-        <li>
-          <a href="/" class="nav-link text-white" onclick="setCookie('token', 'aaa')">
-            <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/sair"></use></svg>
-            Sair
-          </a>
-        </li>
-      </ul>
-      <hr>
-      <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-          <strong>mdo</strong>
+    <div class="d-flex flex-row">
+      <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+          <span class="fs-4">Sidebar</span>
         </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-          <li><a class="dropdown-item" href="#">New project...</a></li>
-          <li><a class="dropdown-item" href="#">Settings</a></li>
-          <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="#">Sign out</a></li>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li class="nav-item">
+            {% if pagina == 'graficos' %}
+              <a href="/graficos" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                Gráficos
+              </a>
+            {% else %}
+              <a href="/graficos" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                Gráficos
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            {% if pagina == 'produtos' %}
+              <a href="/produtos" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                Produtos
+              </a>
+            {% else %}
+              <a href="/produtos" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                Produtos
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            {% if pagina == 'anuncios' %}
+              <a href="/anuncios" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                Anúncios
+              </a>
+            {% else %}
+              <a href="/anuncios" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                Anúncios
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            {% if pagina == 'analise_mercado' %}
+              <a href="/analise_mercado" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                Análise de mercado
+              </a>
+            {% else %}
+              <a href="/analise_mercado" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                Análise de mercado
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            {% if pagina == 'conta' %}
+              <a href="/conta" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                Conta
+              </a>
+            {% else %}
+              <a href="/conta" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                Conta
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            {% if pagina == 'administracao' %}
+              <a href="/administracao" class="nav-link active">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                Administração
+              </a>
+            {% else %}
+              <a href="/administracao" class="nav-link text-white">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                Administração
+              </a>
+            {% endif %}
+          </li>
+          <li>
+            <a href="/" class="nav-link text-white" onclick="setCookie('token', 'aaa')">
+              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/sair"></use></svg>
+              Sair
+            </a>
+          </li>
         </ul>
+        <hr>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>mdo</strong>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-grow-1">
+        {% block body %}{% endblock %}
       </div>
     </div>
 
@@ -121,8 +127,6 @@
           document.cookie = name + "=" + value;
       }
     </script>
-
-    {% block body %}{% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
