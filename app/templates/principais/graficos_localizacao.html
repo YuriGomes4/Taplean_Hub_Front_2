@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link tabgraf" href="/graficos">Vendas</a>
+    </li>
+    <li class="nav-item">
+        <!--<a class="nav-link" href="graficos/localizacao">Localização</a>-->
+        <a class="nav-link tabgraf active" aria-current="page" href="#">Localização</a>
+    </li>
+</ul>
+
+<select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">
+    {% for estado, sigla in estados_brasil.items() %}
+    {% if sigla == "BR" %}
+    <option selected value="{{ sigla }}">{{ estado }}</option>
+    {% else %}
+    <option value="{{ sigla }}">{{ estado }}</option>
+    {% endif %}
+    {% endfor %}
+</select>
+
+<script>
+    function updateURL(selectedValue) {
+        const currentURL = new URL(window.location.href);
+        currentURL.searchParams.set('mapa', selectedValue);
+        window.location.href = currentURL;
+    }
+</script>
+
+<div id="map">
+    {{ fig_localizacao|safe }}
+</div>
+
+{% endblock %}

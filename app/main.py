@@ -86,7 +86,12 @@ def graficos():
         spikedash="dash",
     )
 
-    ################################################################
+    return render_template("principais/graficos.html", pagina=pagina, fig_vendas=fig.to_html(full_html=False, include_plotlyjs='cdn'))
+
+@app.route("/graficos/localizacao")
+@token_required
+def graficos_localizacao():
+    pagina = "graficos"
 
     estados_brasil = {
         "Brasil": "BR",
@@ -161,7 +166,7 @@ def graficos():
             visible=False,
         )
 
-    return render_template("principais/graficos.html", pagina=pagina, fig_vendas=fig.to_html(full_html=False, include_plotlyjs='cdn'), estados_brasil=estados_brasil, fig_localizacao=fig2.to_html(full_html=False, include_plotlyjs='cdn'))
+    return render_template("principais/graficos_localizacao.html", pagina=pagina, estados_brasil=estados_brasil, fig_localizacao=fig2.to_html(full_html=False, include_plotlyjs='cdn'))
 
 @app.route("/produtos")
 @token_required

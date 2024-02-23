@@ -3,74 +3,14 @@
 {% block body %}
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link tabgraf active" aria-current="page" href="#graficos">Vendas</a>
+        <a class="nav-link tabgraf active" aria-current="page" href="#">Vendas</a>
     </li>
     <li class="nav-item">
         <!--<a class="nav-link" href="graficos/localizacao">Localização</a>-->
-        <a class="nav-link tabgraf" href="#localizacao">Localização</a>
+        <a class="nav-link tabgraf" href="graficos/localizacao">Localização</a>
     </li>
 </ul>
 
-<div class="tab-content">
-    <div class="tab-pane tabgraf fade show active" id="graficos">
-        {{ fig_vendas|safe }}
-    </div>
-    <div class="tab-pane tabgraf fade show" id="localizacao"> <!-- Add 'show' class here -->
-        <select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">
-            {% for estado, sigla in estados_brasil.items() %}
-            {% if sigla == "BR" %}
-            <option selected value="{{ sigla }}">{{ estado }}</option>
-            {% else %}
-            <option value="{{ sigla }}">{{ estado }}</option>
-            {% endif %}
-            {% endfor %}
-        </select>
+{{ fig_vendas|safe }}
 
-        <script>
-            function updateURL(selectedValue) {
-                const currentURL = new URL(window.location.href);
-                currentURL.searchParams.set('mapa', selectedValue);
-                window.location.href = currentURL;
-            }
-        </script>
-
-        <div id="map">
-            {{ fig_localizacao|safe }}
-        </div>
-
-        <script>
-
-            // Obtém todos os links de navegação
-            const navLinks = document.querySelectorAll('.nav-link.tabgraf');
-
-            // Adiciona um ouvinte de evento de clique a cada link de navegação
-            navLinks.forEach(link => {
-                link.addEventListener('click', (event) => {
-                    event.preventDefault(); // Impede o comportamento padrão do link
-
-                    // Remove a classe 'active' de todos os links de navegação
-                    navLinks.forEach(link => {
-                        link.classList.remove('active');
-                    });
-
-                    // Adiciona a classe 'active' ao link de navegação clicado
-                    link.classList.add('active');
-
-                    // Obtém o ID da aba alvo a partir do atributo 'href' do link de navegação
-                    const targetTabId = link.getAttribute('href');
-
-                    // Remove a classe 'show' de todas as abas
-                    const tabs = document.querySelectorAll('.tab-pane.tabgraf');
-                    tabs.forEach(tab => {
-                        tab.classList.remove('active');
-                    });
-
-                    // Adiciona a classe 'show' à aba alvo
-                    const targetTab = document.querySelector(targetTabId);
-                    targetTab.classList.add('active');
-                });
-            });
-        </script>
-    </div>
-</div>
 {% endblock %}
