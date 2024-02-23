@@ -2,3 +2,4 @@ venv/
 *.pyc
 testes/
 personal_prefs.cnf
+exemplos/
