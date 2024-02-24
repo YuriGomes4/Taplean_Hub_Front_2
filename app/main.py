@@ -128,45 +128,22 @@ def graficos_localizacao():
 
     if mapa:
         if str(mapa).upper() in estados_brasil.values():
-            map = str(mapa).upper()
+            sigla_mapa = str(mapa).upper()
         else:
-            map = "BR"
+            sigla_mapa = "BR"
     else:
-        map = "BR"
+        sigla_mapa = "BR"
 
-    response = requests.get(f"http://localhost:5000/api/v1/vendas/{services.personal_prefs.get('vendedor')}/mapa/{map}", headers={'x-access-token': request.cookies.get('token')})
+    response = requests.get(f"http://localhost:5000/api/v1/vendas/{services.personal_prefs.get('vendedor')}/mapa/{sigla_mapa}", headers={'x-access-token': request.cookies.get('token')})
 
     if response.status_code == 200:
 
         data = response.json()['result']
         titulo = response.json()['titulo']
         div_vendas = response.json()['div_vendas']
+        mapa_json = response.json()['mapa']
 
-        df = pd.DataFrame(data)
-
-        #print(df)
-
-        fig2 = px.choropleth(
-            df,
-            locations='Estados', # Spatial coordinates
-            color="Vendas",
-            geojson=map,
-            color_continuous_scale=["#0f0888", "#b22c8f", "#f0814e", "#f1f622"],
-            range_color=[0, max(div_vendas.values())/2 if max(div_vendas.values())/2 > 3 else 3]
-            #range_color=[0, 15 if max(div_vendas.values()) > 0 else 3]
-        )
-
-        fig2.update_layout(
-            title_text = titulo,
-            #geo_scope='south america', # limite map scope to USA
-        )
-
-        fig2.update_geos(
-            fitbounds="locations",
-            visible=False,
-        )
-
-    return render_template("principais/graficos_localizacao.html", pagina=pagina, estados_brasil=estados_brasil, fig_localizacao=fig2.to_html(full_html=False, include_plotlyjs='cdn'))
+    return render_template("principais/graficos_localizacao.html", pagina=pagina, estados_brasil=estados_brasil, sigla_mapa=sigla_mapa, div_vendas=div_vendas)
 
 @app.route("/produtos")
 @token_required

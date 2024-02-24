@@ -10,27 +10,85 @@
         <a class="nav-link tabgraf active" aria-current="page" href="#">Localização</a>
     </li>
 </ul>
+<div style="padding: 10px;">
+    <select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">
+        {% for estado, sigla in estados_brasil.items() %}
+        {% if sigla == sigla_mapa %}
+        <option selected value="{{ sigla }}">{{ estado }}</option>
+        {% else %}
+        <option value="{{ sigla }}">{{ estado }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
 
-<select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">
-    {% for estado, sigla in estados_brasil.items() %}
-    {% if sigla == "BR" %}
-    <option selected value="{{ sigla }}">{{ estado }}</option>
-    {% else %}
-    <option value="{{ sigla }}">{{ estado }}</option>
-    {% endif %}
-    {% endfor %}
-</select>
+    <script>
+        function updateURL(selectedValue) {
+            const currentURL = new URL(window.location.href);
+            currentURL.searchParams.set('mapa', selectedValue);
+            window.location.href = currentURL;
+        }
+    </script>
 
-<script>
-    function updateURL(selectedValue) {
-        const currentURL = new URL(window.location.href);
-        currentURL.searchParams.set('mapa', selectedValue);
-        window.location.href = currentURL;
-    }
-</script>
+    <div id="map">
+        {{ fig_localizacao|safe }}
 
-<div id="map">
-    {{ fig_localizacao|safe }}
+        <div id="responseDiv"></div>
+
+        <script>
+            function getCookie(name) {
+                const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                return cookieValue ? cookieValue.pop() : '';
+            }
+            
+            function load_grafico() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://localhost:5000/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/mapa/{{ sigla_mapa }}?framework=plotly', true);
+                xhr.setRequestHeader('x-access-token', getCookie('token'));
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);        
+                        // Manipulate response data here
+                        document.getElementById("responseDiv").innerHTML = response.result;
+                    } else {
+                        // Handle any errors here
+                    }
+                };
+                xhr.send();
+            }
+
+            load_grafico();
+        </script>
+        
+    </div>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabela_vendas.css') }}">
+
+    <script src="{{ url_for('static', filename='js/tabela_vendas.js') }}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+
+    <div class="container">
+        <div class="table-wrap">
+            <table class="sortable display table table-striped table-bordered table-sm" style="width:100%">
+                <thead>
+                    <tr>
+                        <th><button>Estados<span aria-hidden="true"></span></button></th>
+                        <th aria-sort="ascending" class="num"><button>Vendas<span aria-hidden="true"></span></button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for estado, vendas in div_vendas.items() %}
+                    <tr>
+                        <td>{{ estado }}</td>
+                        <td>{{ vendas }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
