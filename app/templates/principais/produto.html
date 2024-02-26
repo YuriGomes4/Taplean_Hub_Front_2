@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Produto</h1>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link tabgraf active" aria-current="page" data-toggle="#detalhes" onclick="changeTab(event)">Detalhes</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#graficos" onclick="changeTab(event)">Gráficos</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#regras" onclick="changeTab(event)">Regras</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#qualidade" onclick="changeTab(event)">Qualidade</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#anotacoes" onclick="changeTab(event)">Anotações</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#historico" onclick="changeTab(event)">Histórico</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="detalhes" class="tab-pane fade active show" style="width: 100%;">
+        <div id="div_detalhes" style="padding: 10px;">
+        </div>
+
+        <script>
+            var base_url = '{{ base_url }}';
+            var mlb = '{{ mlb }}';
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', base_url+'/api/v1/produto/'+mlb, true);
+            xhr.setRequestHeader('x-access-token', getCookie('token'));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText).result;
+                    
+                    div_det = document.getElementById('div_detalhes');
+
+                    var p_frete_gratis = document.createElement('p');
+                    var p_liquido = document.createElement('p');
+                    var p_mlb = document.createElement('p');
+                    var p_titulo = document.createElement('p');
+                    var p_categoria = document.createElement('p');
+                    var p_status = document.createElement('p');
+                    var p_preco_venda = document.createElement('p');
+                    var p_tipo_anuncio = document.createElement('p');
+                    var p_custo_frete = document.createElement('p');
+                    var p_taxas_venda = document.createElement('p');
+                    var p_vendas = document.createElement('p');
+
+                    var dict_free_shipping = {
+                        '1': 'Sim',
+                        '0': 'Não'
+                    };
+
+                    var statusDict = {
+                        "active": "Ativo",
+                        "paused": "Pausado",
+                        "under_review": "Em revisão"
+                    };
+
+                    var dict_listing = {
+                        'gold_pro': 'Premium',
+                        'gold_premium': 'Diamante',
+                        'gold_special': 'Clássico',
+                        'gold': 'Ouro',
+                        'silver': 'Prata',
+                        'bronze': 'Bronze',
+                        'free': 'Gratuíto',
+                    };
+
+                    p_frete_gratis.textContent = 'Frete grátis: ' + dict_free_shipping[response.free_shipping];
+                    p_liquido.textContent = 'Líquido: R$ ' + (response.sale_fee - response.shipping_free_cost - response.cost).toFixed(2).replace('.', ',');
+                    p_mlb.textContent = 'MLB: ' + response.id;
+                    p_titulo.textContent = 'Título: ' + response.title;
+                    p_categoria.textContent = 'Categoria: ' + response.category.way + ' (' + response.category_id + ')';
+                    p_status.textContent = 'Status: ' + statusDict[response.status];
+                    p_preco_venda.textContent = 'Preço de venda: R$ ' + response.price;
+                    p_tipo_anuncio.textContent = 'Tipo de anúncio: ' + dict_listing[response.listing_type_id];
+                    p_custo_frete.textContent = 'Custo de frete: R$ ' + response.shipping_free_cost;
+                    p_taxas_venda.textContent = 'Taxas de venda: R$' + response.sale_fee;
+                    p_vendas.textContent = 'Vendas: ' + response.sales;
+
+
+                    div_det.appendChild(p_frete_gratis);
+                    div_det.appendChild(p_liquido);
+                    div_det.appendChild(p_mlb);
+                    div_det.appendChild(p_titulo);
+                    div_det.appendChild(p_categoria);
+                    div_det.appendChild(p_status);
+                    div_det.appendChild(p_preco_venda);
+                    div_det.appendChild(p_tipo_anuncio);
+                    div_det.appendChild(p_custo_frete);
+                    div_det.appendChild(p_taxas_venda);
+                    div_det.appendChild(p_vendas);
+                }
+            }
+            xhr.send();
+        </script>
+    </div>
+    <div id="graficos" class="tab-pane fade active" style="width: 100%;">
+    </div>
+    <div id="regras" class="tab-pane fade active" style="width: 100%;">
+    </div>
+    <div id="qualidade" class="tab-pane fade active" style="width: 100%;">
+    </div>
+    <div id="anotacoes" class="tab-pane fade active" style="width: 100%;">
+    </div>
+    <div id="historico" class="tab-pane fade active" style="width: 100%;">
+    </div>
+</div>
+
+<script>
+    function changeTab(event) {
+        const tabs = document.querySelectorAll('.nav-link.tabgraf');
+        const tabContent = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        tabContent.forEach(content => {
+            //content.classList.remove('active');
+            content.style.height = '0';
+            content.style.visibility = 'hidden';
+            content.classList.remove('show');
+        });
+        
+        event.target.classList.add('active');
+        const targetTab = document.querySelector(event.target.getAttribute('data-toggle'));
+        targetTab.classList.add('active');
+        targetTab.classList.add('show');
+        targetTab.style.height = 'auto';
+        targetTab.style.visibility = 'visible';
+    }
+</script>
+
+{% endblock %}

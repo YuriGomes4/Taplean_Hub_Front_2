@@ -3,20 +3,21 @@
 {% block body %}
 <div class="row" style="width: 100%;">
     <div class="col">
-        <div class="input-group mb-3">
+        <div id="pesquisa" class="input-group mb-3">
             <input id="input_search" type="text" class="form-control" placeholder="Pesquise pelo produto" aria-label="Pesquise pelo produto" aria-describedby="button-search">
-            <button class="btn btn-outline-secondary" type="button" id="button-search">Pesquisar</button>
+            <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="load_produtos()">Pesquisar</button>
         </div>
     </div>
     <div class="col-auto">
-        <select class="form-select" aria-label="Filtro">
+        <select id="filtro" class="form-select" aria-label="Filtro" onchange="load_produtos()">
             <option selected value="Nenhum">Nenhum</option>
             <option value="Ativos">Ativos</option>
             <option value="Pausados">Pausados</option>
+            <option value="Em revisão">Em revisão</option>
         </select>
     </div>
     <div class="col-auto">
-        <select class="form-select" aria-label="Ordenação">
+        <select id="ordenacao" class="form-select" aria-label="Ordenação" onchange="load_produtos()">
             <option selected value="Normal">Normal</option>
             <option value="Curva ABC">Curva ABC</option>
         </select>
@@ -24,7 +25,7 @@
 </div>
 
 <table class="table table-hover">
-    <thead>
+    <thead id="cab_lista_vendas">
         <tr>
             <th>MLB</th>
             <th>Titulo</th>
@@ -40,8 +41,44 @@
 
 <script>
     function load_produtos() {
+
+        var tableHead = document.getElementById("cab_lista_vendas");
+
+        tableHead.innerHTML = ""; // Clear existing table rows
+
+        row = document.createElement("tr");
+
+        if (document.getElementById('ordenacao').value === "Curva ABC") {
+            var curvaTh = document.createElement("th");
+            curvaTh.textContent = "Curva";
+            row.appendChild(curvaTh);
+        }
+
+        var mlbTh = document.createElement("th");
+        var tiutloTh = document.createElement("th");
+        var statusTh = document.createElement("th");
+        var qualidadeTh = document.createElement("th");
+        var liquidoTh = document.createElement("th");
+        var acaoTh = document.createElement("th");
+
+        mlbTh.textContent = "MLB";
+        tiutloTh.textContent = "Titulo";
+        statusTh.textContent = "Status";
+        qualidadeTh.textContent = "Qualidade";
+        liquidoTh.textContent = "Líquido";
+        acaoTh.textContent = "";
+
+        row.appendChild(mlbTh);
+        row.appendChild(tiutloTh);
+        row.appendChild(statusTh);
+        row.appendChild(qualidadeTh);
+        row.appendChild(liquidoTh);
+        row.appendChild(acaoTh);
+
+        tableHead.appendChild(row);
+
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "{{ base_url }}/api/v1/produto/all", true);
+        xhr.open("GET", "{{ base_url }}/api/v1/produto/all?pesquisa="+document.getElementById('input_search').value+"&ordenacao="+document.getElementById('ordenacao').value+"&filtro="+document.getElementById('filtro').value, true);
         xhr.setRequestHeader("x-access-token", getCookie("token"));
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
@@ -60,11 +97,24 @@
                         var liquidoCell = document.createElement("td");
                         var editarCell = document.createElement("td");
 
+                        if (document.getElementById('ordenacao').value === "Curva ABC") {
+                            var curvaCell = document.createElement("td");
+                            curvaCell.textContent = produto.icone;
+                            curvaCell.style.color = produto.color;
+                            row.appendChild(curvaCell);
+                        }
+
+                        var statusDict = {
+                            "active": "Ativo",
+                            "paused": "Pausado",
+                            "under_review": "Em revisão"
+                        };
+
                         mlbCell.textContent = produto.id;
                         tituloCell.textContent = produto.title;
-                        statusCell.textContent = produto.status;
-                        qualidadeCell.textContent = produto.health;
-                        liquidoCell.textContent = (produto.price - produto.shipping_free_cost - produto.sale_fee - produto.cost).toFixed(2);
+                        statusCell.textContent = statusDict[produto.status];
+                        qualidadeCell.textContent = (produto.health*100)+"%";
+                        liquidoCell.textContent = "R$ "+(produto.price - produto.shipping_free_cost - produto.sale_fee - produto.cost).toFixed(2).replace(".", ",");
                         editarCell.innerHTML = '<a class="btn btn-primary" href="/produto/'+produto.id+'" role="button">Editar</a>';
 
                         row.appendChild(mlbCell);

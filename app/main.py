@@ -129,6 +129,12 @@ def produtos():
     pagina = "produtos"
     return render_template("principais/produtos.html", base_url=base_url, pagina=pagina)
 
+@app.route("/produto/<string:mlb>")
+@token_required
+def produto(mlb):
+    pagina = "produto"
+    return render_template("principais/produto.html", base_url=base_url, pagina=pagina, mlb=mlb)
+
 @app.route("/anuncios")
 @token_required
 def anuncios():
