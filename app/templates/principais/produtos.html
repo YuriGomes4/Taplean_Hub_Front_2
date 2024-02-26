@@ -1,22 +1,89 @@
 {% extends 'base.html' %}
 
 {% block body %}
+<div class="row" style="width: 100%;">
+    <div class="col">
+        <div class="input-group mb-3">
+            <input id="input_search" type="text" class="form-control" placeholder="Pesquise pelo produto" aria-label="Pesquise pelo produto" aria-describedby="button-search">
+            <button class="btn btn-outline-secondary" type="button" id="button-search">Pesquisar</button>
+        </div>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" aria-label="Filtro">
+            <option selected value="Nenhum">Nenhum</option>
+            <option value="Ativos">Ativos</option>
+            <option value="Pausados">Pausados</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" aria-label="Ordenação">
+            <option selected value="Normal">Normal</option>
+            <option value="Curva ABC">Curva ABC</option>
+        </select>
+    </div>
+</div>
+
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Produto</th>
-            <th>Preço</th>
-            <th>Quantidade</th>
+            <th>MLB</th>
+            <th>Titulo</th>
+            <th>Status</th>
+            <th>Qualidade</th>
+            <th>Líquido</th>
+            <th></th>
         </tr>
     </thead>
-    <tbody>
-        {% for produto in produtos %}
-        <tr>
-            <td>{{ produto.nome }}</td>
-            <td>{{ produto.preco }}</td>
-            <td>{{ produto.quantidade }}</td>
-        </tr>
-        {% endfor %}
+    <tbody id="lista_vendas">
     </tbody>
 </table>
+
+<script>
+    function load_produtos() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "{{ base_url }}/api/v1/produto/all", true);
+        xhr.setRequestHeader("x-access-token", getCookie("token"));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    var tableBody = document.querySelector("#lista_vendas");
+                    tableBody.innerHTML = ""; // Clear existing table rows
+
+                    for (var produto in response.result) {
+                        var produto = response.result[produto];
+                        var row = document.createElement("tr");
+                        var mlbCell = document.createElement("td");
+                        var tituloCell = document.createElement("td");
+                        var statusCell = document.createElement("td");
+                        var qualidadeCell = document.createElement("td");
+                        var liquidoCell = document.createElement("td");
+                        var editarCell = document.createElement("td");
+
+                        mlbCell.textContent = produto.id;
+                        tituloCell.textContent = produto.title;
+                        statusCell.textContent = produto.status;
+                        qualidadeCell.textContent = produto.health;
+                        liquidoCell.textContent = (produto.price - produto.shipping_free_cost - produto.sale_fee - produto.cost).toFixed(2);
+                        editarCell.innerHTML = '<a class="btn btn-primary" href="/produto/'+produto.id+'" role="button">Editar</a>';
+
+                        row.appendChild(mlbCell);
+                        row.appendChild(tituloCell);
+                        row.appendChild(statusCell);
+                        row.appendChild(qualidadeCell);
+                        row.appendChild(liquidoCell);
+                        row.appendChild(editarCell);
+
+                        tableBody.appendChild(row);
+                    }
+                } else {
+                    // Handle any errors here
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    load_produtos();
+</script>
 {% endblock %}

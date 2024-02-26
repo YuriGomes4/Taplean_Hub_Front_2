@@ -3,14 +3,167 @@
 {% block body %}
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link tabgraf active" aria-current="page" href="#">Vendas</a>
+        <a class="nav-link tabgraf active" aria-current="page" data-toggle="#vendas" onclick="changeTab(event)">Vendas</a>
     </li>
     <li class="nav-item">
-        <!--<a class="nav-link" href="graficos/localizacao">Localização</a>-->
-        <a class="nav-link tabgraf" href="graficos/localizacao">Localização</a>
+        <a class="nav-link tabgraf" data-toggle="#localizacao" onclick="changeTab(event)">Localização</a>
     </li>
 </ul>
 
-{{ fig_vendas|safe }}
+<div class="tab-content">
+    <div id="vendas" class="tab-pane fade active show" style="width: 100%;">
+        {{ fig_vendas|safe }}
+    </div>
+    <div id="localizacao" class="tab-pane fade active" style="width: 100%;">
+        <div style="padding: 10px;">
+            <select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">
+                {% for estado, sigla in estados_brasil.items() %}
+                <option value="{{ sigla }}">{{ estado }}</option>
+                {% endfor %}
+                
+            </select>
+
+            <script>
+                const currentURL = new URL(window.location.href);
+                var selectElem = document.querySelector("select");
+
+                if (currentURL.searchParams.has('mapa')) {
+                    var currentMap = currentURL.searchParams.get('mapa');
+                } else {
+                    var currentMap = 'br';
+                }
+                //selectElem.setAttribute("data-toggle", currentURL.searchParams.get('mapa'));
+
+                for (var i = 0; i < selectElem.options.length; i++) {
+                    if (selectElem.options[i].value === currentMap) {
+                        selectElem.options[i].setAttribute("selected", "selected");
+                    }
+                }
+            </script>
+
+            <script>
+                function updateURL(selectedValue) {
+                    const currentURL = new URL(window.location.href);
+                    currentURL.searchParams.set('mapa', selectedValue);
+                    window.history.pushState({}, '', currentURL);
+                    document.querySelector("#tabela_vendas").classList.add("invisible");
+                    document.getElementById("responseDiv").innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border m-5" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                    load_grafico_localizacao_e_tabela();
+                }
+            </script>
+        
+            <div id="map">
+                <div id="responseDiv">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border m-5" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/tabela_vendas.css') }}">
+        
+            <script src="{{ url_for('static', filename='js/tabela_vendas.js') }}"></script>
+        
+            <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+            <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+        
+            <div class="container">
+                <div class="table-wrap">
+                    <table id="tabela_vendas" class="sortable invisible display table table-striped table-bordered table-sm" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th><button>Estados<span aria-hidden="true"></span></button></th>
+                                <th aria-sort="ascending" class="num"><button>Vendas<span aria-hidden="true"></span></button></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+        
+                    <script>
+                        function load_grafico_localizacao_e_tabela() {
+            
+                            const currentURL = new URL(window.location.href);
+                            var sigla_mapa = null;
+                            if (currentURL.searchParams.has('mapa')) {
+                                sigla_mapa = currentURL.searchParams.get('mapa');
+                            } else {
+                                sigla_mapa = 'br';
+                            }
+            
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('GET', '{{ base_url }}/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/mapa/localizacao/'+sigla_mapa+'?framework=plotly', true);
+                            xhr.setRequestHeader('x-access-token', getCookie('token'));
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState === 4 && xhr.status === 200) {
+                                    var response = JSON.parse(xhr.responseText);        
+                                    // Manipulate response data here
+                                    document.getElementById("responseDiv").innerHTML = response.result;
+                                    var scripts = document.getElementById('responseDiv').getElementsByTagName('script');
+                                    for (var i = 0; i < scripts.length; i++) {
+                                        eval(scripts[i].innerHTML);
+                                    }
+            
+                                    var tableBody = document.querySelector("#tabela_vendas tbody");
+                                    tableBody.innerHTML = ""; // Clear existing table rows
+                                    
+                                    for (var estado in response.div_vendas) {
+                                        var vendas = response.div_vendas[estado];
+                                        var row = document.createElement("tr");
+                                        var estadoCell = document.createElement("td");
+                                        var vendasCell = document.createElement("td");
+                                        
+                                        estadoCell.textContent = estado;
+                                        vendasCell.textContent = vendas;
+                                        
+                                        row.appendChild(estadoCell);
+                                        row.appendChild(vendasCell);
+                                        
+                                        tableBody.appendChild(row);
+                                    }
+            
+                                    document.querySelector("#tabela_vendas").classList.remove("invisible");
+                                } else {
+                                    // Handle any errors here
+                                }
+                            };
+                            xhr.send();
+                        }
+            
+                        load_grafico_localizacao_e_tabela();
+                    </script>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeTab(event) {
+        const tabs = document.querySelectorAll('.nav-link.tabgraf');
+        const tabContent = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        tabContent.forEach(content => {
+            //content.classList.remove('active');
+            content.style.height = '0';
+            content.style.visibility = 'hidden';
+            content.classList.remove('show');
+        });
+        
+        event.target.classList.add('active');
+        const targetTab = document.querySelector(event.target.getAttribute('data-toggle'));
+        targetTab.classList.add('active');
+        targetTab.classList.add('show');
+        targetTab.style.height = 'auto';
+        targetTab.style.visibility = 'visible';
+    }
+</script>
 
 {% endblock %}

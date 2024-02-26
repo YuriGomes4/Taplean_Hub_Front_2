@@ -14,12 +14,14 @@ app = Flask(__name__)
 
 CORS(app)
 
+base_url = services.config.get('url_base')
+
 def token_required(route_func):
     @functools.wraps(route_func)
     def wrapper(*args, **kwargs):
         token = request.cookies.get('token')
         if token:
-            response = requests.get('http://localhost:5000/api/auth/verify', headers={'x-access-token': token})
+            response = requests.get(f'{base_url}/api/auth/verify', headers={'x-access-token': token})
             if response.status_code == 200:
                 return route_func(*args, **kwargs)
             else:
@@ -37,7 +39,7 @@ def index():
 #@token_required
 def login():
     pagina = "login"
-    return render_template("login.html", pagina=pagina)
+    return render_template("login.html", base_url=base_url, pagina=pagina)
 
 @app.route("/graficos")
 @token_required
@@ -86,12 +88,7 @@ def graficos():
         spikedash="dash",
     )
 
-    return render_template("principais/graficos.html", pagina=pagina, fig_vendas=fig.to_html(full_html=False, include_plotlyjs='cdn'))
-
-@app.route("/graficos/localizacao")
-@token_required
-def graficos_localizacao():
-    pagina = "graficos"
+    ####################################################################
 
     estados_brasil = {
         "Brasil": "BR",
@@ -124,56 +121,37 @@ def graficos_localizacao():
         "Tocantins": "TO"
     }
 
-    mapa = request.args.get('mapa')
-
-    if mapa:
-        if str(mapa).upper() in estados_brasil.values():
-            sigla_mapa = str(mapa).upper()
-        else:
-            sigla_mapa = "BR"
-    else:
-        sigla_mapa = "BR"
-
-    response = requests.get(f"http://localhost:5000/api/v1/vendas/{services.personal_prefs.get('vendedor')}/mapa/{sigla_mapa}", headers={'x-access-token': request.cookies.get('token')})
-
-    if response.status_code == 200:
-
-        data = response.json()['result']
-        titulo = response.json()['titulo']
-        div_vendas = response.json()['div_vendas']
-        mapa_json = response.json()['mapa']
-
-    return render_template("principais/graficos_localizacao.html", pagina=pagina, estados_brasil=estados_brasil, sigla_mapa=sigla_mapa, div_vendas=div_vendas)
+    return render_template("principais/graficos.html", base_url=base_url, pagina=pagina, fig_vendas=fig.to_html(full_html=False, include_plotlyjs='cdn'), estados_brasil=estados_brasil)
 
 @app.route("/produtos")
 @token_required
 def produtos():
     pagina = "produtos"
-    return render_template("principais/produtos.html", pagina=pagina)
+    return render_template("principais/produtos.html", base_url=base_url, pagina=pagina)
 
 @app.route("/anuncios")
 @token_required
 def anuncios():
     pagina = "anuncios"
-    return render_template("principais/anuncios.html", pagina=pagina)
+    return render_template("principais/anuncios.html", base_url=base_url, pagina=pagina)
 
 @app.route("/analise_mercado")
 @token_required
 def analise_mercado():
     pagina = "analise_mercado"
-    return render_template("principais/analise_mercado.html", pagina=pagina)
+    return render_template("principais/analise_mercado.html", base_url=base_url, pagina=pagina)
 
 @app.route("/conta")
 @token_required
 def conta():
     pagina = "conta"
-    return render_template("principais/conta.html", pagina=pagina)
+    return render_template("principais/conta.html", base_url=base_url, pagina=pagina)
 
 @app.route("/administracao")
 @token_required
 def administracao():
     pagina = "administracao"
-    return render_template("principais/administracao.html", pagina=pagina)
+    return render_template("principais/administracao.html", base_url=base_url, pagina=pagina)
 
 app.static_folder = 'templates/assets'
 

@@ -25,40 +25,21 @@
         function updateURL(selectedValue) {
             const currentURL = new URL(window.location.href);
             currentURL.searchParams.set('mapa', selectedValue);
-            window.location.href = currentURL;
+            window.location.href = currentURL.href;
+            document.querySelector("#tabela_vendas").classList.add("invisible");
+            document.getElementById("responseDiv").innerHTML = '<div class="d-flex justify-content-center"><div class="spinner-border m-5" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            load_grafico_localizacao_e_tabela();
         }
     </script>
 
     <div id="map">
-        {{ fig_localizacao|safe }}
-
-        <div id="responseDiv"></div>
-
-        <script>
-            function getCookie(name) {
-                const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-                return cookieValue ? cookieValue.pop() : '';
-            }
-            
-            function load_grafico() {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://localhost:5000/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/mapa/{{ sigla_mapa }}?framework=plotly', true);
-                xhr.setRequestHeader('x-access-token', getCookie('token'));
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);        
-                        // Manipulate response data here
-                        document.getElementById("responseDiv").innerHTML = response.result;
-                    } else {
-                        // Handle any errors here
-                    }
-                };
-                xhr.send();
-            }
-
-            load_grafico();
-        </script>
-        
+        <div id="responseDiv">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border m-5" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tabela_vendas.css') }}">
@@ -70,7 +51,7 @@
 
     <div class="container">
         <div class="table-wrap">
-            <table class="sortable display table table-striped table-bordered table-sm" style="width:100%">
+            <table id="tabela_vendas" class="sortable invisible display table table-striped table-bordered table-sm" style="width:100%">
                 <thead>
                     <tr>
                         <th><button>Estados<span aria-hidden="true"></span></button></th>
@@ -78,14 +59,66 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for estado, vendas in div_vendas.items() %}
-                    <tr>
-                        <td>{{ estado }}</td>
-                        <td>{{ vendas }}</td>
-                    </tr>
-                    {% endfor %}
                 </tbody>
             </table>
+
+            <script>
+                function getCookie(name) {
+                    const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                    return cookieValue ? cookieValue.pop() : '';
+                }
+                
+                function load_grafico_localizacao_e_tabela() {
+    
+                    const currentURL = new URL(window.location.href);
+                    var sigla_mapa = null;
+                    if (currentURL.searchParams.has('mapa')) {
+                        sigla_mapa = currentURL.searchParams.get('mapa');
+                    } else {
+                        sigla_mapa = 'br';
+                    }
+    
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '{{ base_url }}/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/mapa/localizacao/'+sigla_mapa+'?framework=plotly', true);
+                    xhr.setRequestHeader('x-access-token', getCookie('token'));
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            var response = JSON.parse(xhr.responseText);        
+                            // Manipulate response data here
+                            document.getElementById("responseDiv").innerHTML = response.result;
+                            var scripts = document.getElementById('responseDiv').getElementsByTagName('script');
+                            for (var i = 0; i < scripts.length; i++) {
+                                eval(scripts[i].innerHTML);
+                            }
+    
+                            var tableBody = document.querySelector("#tabela_vendas tbody");
+                            tableBody.innerHTML = ""; // Clear existing table rows
+                            
+                            for (var estado in response.div_vendas) {
+                                var vendas = response.div_vendas[estado];
+                                var row = document.createElement("tr");
+                                var estadoCell = document.createElement("td");
+                                var vendasCell = document.createElement("td");
+                                
+                                estadoCell.textContent = estado;
+                                vendasCell.textContent = vendas;
+                                
+                                row.appendChild(estadoCell);
+                                row.appendChild(vendasCell);
+                                
+                                tableBody.appendChild(row);
+                            }
+    
+                            document.querySelector("#tabela_vendas").classList.remove("invisible");
+                        } else {
+                            // Handle any errors here
+                        }
+                    };
+                    xhr.send();
+                }
+    
+                load_grafico_localizacao_e_tabela();
+            </script>
         </div>
     </div>
 

@@ -8,6 +8,16 @@
     {% block head %}{% endblock %}
   </head>
   <body>
+    <script>
+      function setCookie(name, value) {
+          document.cookie = name + "=" + value;
+      }
+
+      function getCookie(name) {
+          const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+          return cookieValue ? cookieValue.pop() : '';
+      }
+    </script>
     <div class="d-flex flex-row flex-grow-1">
       <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 100vh; position: fixed;">
         <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
@@ -117,17 +127,11 @@
         </div>
       </div>
 
-      <div style="width: 280px;"></div>
+      <div style="width: 280px; min-width: 280px; max-width: 280px;"></div>
       <div class="flex-grow-1" style="padding: 10px;">
         {% block body %}{% endblock %}
       </div>
     </div>
-
-    <script>
-      function setCookie(name, value) {
-          document.cookie = name + "=" + value;
-      }
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
