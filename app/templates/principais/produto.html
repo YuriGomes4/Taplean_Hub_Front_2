@@ -105,16 +105,66 @@
             xhr.send();
         </script>
     </div>
-    <div id="graficos" class="tab-pane fade active" style="width: 100%;">
+    <div id="graficos" class="tab-pane fade active" style="width: 100%; visibility: hidden; height: 0px;">
+        <div style="padding: 10px;">
+            <div class="col-auto">
+                <label for="example">Período analisado</label>
+                <select id="filtro_data" class="form-select" aria-label="Período analisado" onchange="dt_change()">
+                    <option selected value="Última semana">Última semana</option>
+                    <option value="Último mês">Último mês</option>
+                    <option value="Últimos 2 meses">Últimos 2 meses</option>
+                    <option value="Últimos 3 meses">Últimos 3 meses</option>
+                    <option value="Personalizado">Personalizado</option>
+                </select>
+            </div>
+
+            <div id="datepicker">
+            </div>
+        </div>
+
+        <script>
+            function dt_change() {
+                var periodo = document.getElementById('filtro_data').value;
+
+                var datepicker = document.getElementById('datepicker');
+
+                if (periodo !== 'Personalizado') {
+                    datepicker.innerHTML = ''
+                    var intervalo = tempo_opcoes[periodo]['intervalo'];
+                    var dias = tempo_opcoes[periodo]['dias'];
+
+                } else {
+
+                    
+                    //var date = new Date();
+                    //var today = date.toISOString().split('T')[0];
+                    //var last = new Date(date.getTime() - (dias * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+                
+                    datepicker.innerHTML = '<div class="md-form md-outline input-with-post-icon datepicker"><label for="example">Filtrar por data</label><input placeholder="Select date" type="date" id="example" class="form-control"></div>';
+                }
+            };
+
+            tempo_opcoes = {
+                "Última semana": {'dias': 7, 'intervalo': 1},
+                "Último mês": {'dias': 30, 'intervalo': 10},
+                "Últimos 2 meses": {'dias': 60, 'intervalo': 30},
+                "Últimos 3 meses": {'dias': 90, 'intervalo': 30},
+                "Personalizado": {}
+            };
+        </script>
     </div>
-    <div id="regras" class="tab-pane fade active" style="width: 100%;">
+    <div id="regras" class="tab-pane fade active" style="width: 100%; visibility: hidden; height: 0px;">
     </div>
-    <div id="qualidade" class="tab-pane fade active" style="width: 100%;">
+    <div id="qualidade" class="tab-pane fade active" style="width: 100%; visibility: hidden; height: 0px;">
     </div>
-    <div id="anotacoes" class="tab-pane fade active" style="width: 100%;">
+    <div id="anotacoes" class="tab-pane fade active" style="width: 100%; visibility: hidden; height: 0px;">
     </div>
-    <div id="historico" class="tab-pane fade active" style="width: 100%;">
+    <div id="historico" class="tab-pane fade active" style="width: 100%; visibility: hidden; height: 0px;">
     </div>
+</div>
+
+<div class="d-grid gap-2">
+    <button class="btn btn-primary" type="button" onclick="window.location.href='/produtos'">Ver todos os produtos</button>
 </div>
 
 <script>
