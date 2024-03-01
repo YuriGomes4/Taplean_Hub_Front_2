@@ -17,6 +17,13 @@
           const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
           return cookieValue ? cookieValue.pop() : '';
       }
+
+      function rodarScripts(element) {
+        var scripts = element.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++) {
+          eval(scripts[i].innerHTML);
+        }
+      }
     </script>
     <div class="d-flex flex-row flex-grow-1">
       <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 100vh; position: fixed;">

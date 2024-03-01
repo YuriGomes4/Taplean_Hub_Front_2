@@ -1,1 +1,78 @@
 {% extends 'base.html' %}
+
+{% block body %}
+<div id="sellerSelect">
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border m-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    var base_url = "{{ base_url }}";
+
+    function load_sellers() {
+
+        var sellerSelect = document.getElementById("sellerSelect");
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", base_url + "/api/v1/usuario/sellers", true);
+        xhr.setRequestHeader("x-access-token", getCookie("token"));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText).result;
+                
+                var vendedores = {};
+                var vendedoresInv = {};
+                var xhr2 = new XMLHttpRequest();
+                
+                xhr2.open("GET", base_url + "/api/v1/vendedor?id=" + response.join(','), true);
+                xhr2.setRequestHeader("x-access-token", getCookie("token"));
+                xhr2.onreadystatechange = function() {
+                    if (xhr2.readyState === 4 && xhr2.status === 200) {
+                        var response2 = JSON.parse(xhr2.responseText).result;
+                        
+                        var seller_select = document.createElement("select");
+                        seller_select.id = "seller_select";
+                        seller_select.className = "form-select";
+                        seller_select.setAttribute("aria-label", "Vendedor");
+                        seller_select.setAttribute("onchange", "change_seller()");
+                        
+                        sellerSelect.innerHTML = "";
+                        sellerSelect.appendChild(seller_select);
+
+                        for (var i = 0; i < response2.length; i++) {
+                            var option = document.createElement("option");
+                            option.value = response2[i].id_publico;
+                            option.textContent = response2[i].nome;
+
+                            if (response2[i].id_publico === JSON.parse(getCookie("prefs").replace(/'/g, '"')).vendedor) {
+                                option.selected = true;
+                            }
+
+                            seller_select.appendChild(option);
+                        }
+                    }
+                };
+                console.log("opa");
+                xhr2.send();
+            }
+        };
+        xhr.send();
+    }
+    load_sellers();
+    function change_seller() {
+        var seller_select = document.getElementById("seller_select");
+
+        var prefs = JSON.parse(getCookie("prefs").replace(/'/g, '"'));
+        prefs.vendedor = seller_select.value;
+        setCookie("prefs", JSON.stringify(prefs).replace(/"/g, "'"));
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", base_url + "/api/v1/usuario/preferences?dados="+JSON.stringify(prefs).replace(/"/g, "'"), true);
+        xhr.setRequestHeader("x-access-token", getCookie("token"));
+        xhr.send();
+    }
+</script>
+{% endblock %}

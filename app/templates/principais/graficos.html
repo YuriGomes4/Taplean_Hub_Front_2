@@ -100,11 +100,9 @@
                                 if (xhr.readyState === 4 && xhr.status === 200) {
                                     var response = JSON.parse(xhr.responseText);        
                                     // Manipulate response data here
-                                    document.getElementById("responseDiv").innerHTML = response.result;
-                                    var scripts = document.getElementById('responseDiv').getElementsByTagName('script');
-                                    for (var i = 0; i < scripts.length; i++) {
-                                        eval(scripts[i].innerHTML);
-                                    }
+                                    responseDiv = document.getElementById("responseDiv");
+                                    responseDiv.innerHTML = response.result;
+                                    rodarScripts(responseDiv)
             
                                     var tableBody = document.querySelector("#tabela_vendas tbody");
                                     tableBody.innerHTML = ""; // Clear existing table rows
