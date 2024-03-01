@@ -5,10 +5,10 @@ from . import config
 from flask import request
 
 def get_all():
-    return json.loads(request.cookies.get('prefs').replace("'", '"'))
+    return json.loads(str(request.cookies.get('prefs')).replace("'", '"'))
 
 def get(name):
-    data = json.loads(request.cookies.get('prefs').replace("'", '"'))
+    data = json.loads(str(request.cookies.get('prefs')).replace("'", '"'))
 
     try:
         return data[name]
@@ -22,7 +22,7 @@ def get(name):
 
 def set(name, value):
     try:
-        json.loads(request.cookies.get('prefs').replace("'", '"'))[name] = value
+        json.loads(str(request.cookies.get('prefs')).replace("'", '"'))[name] = value
 
         url_base = config.get("url_base")
 
@@ -33,7 +33,7 @@ def set(name, value):
         }
 
         params = {
-            'dados': str(json.loads(request.cookies.get('prefs').replace("'", '"')))
+            'dados': str(json.loads(str(request.cookies.get('prefs')).replace("'", '"')))
         }
 
         response = requests.put(update_url, headers=headers, params=params)

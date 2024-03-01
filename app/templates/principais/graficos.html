@@ -12,8 +12,43 @@
 
 <div class="tab-content">
     <div id="vendas" class="tab-pane fade active show" style="width: 100%;">
-        {{ fig_vendas|safe }}
+        <div style="padding: 10px;">
+            <div id="graf">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border m-5" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function load_grafico_vendas() {
+                var dateOptions = { timeZone: 'America/Sao_Paulo' };
+                var ending = new Date().toLocaleDateString("pt-BR", dateOptions);
+                ending = ending.split('/').reverse().join('-');
+
+                var xhrGf = new XMLHttpRequest();
+                xhrGf.open('GET', '{{ base_url }}/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/time_window?ending='+ending+'&framework=plotly', true);
+                xhrGf.setRequestHeader('x-access-token', getCookie('token'));
+                xhrGf.onreadystatechange = function() {
+                    if (xhrGf.readyState === 4 && xhrGf.status === 200) {
+                        var response = JSON.parse(xhrGf.responseText);
+                        // Manipulate response data here
+                        responseDiv = document.getElementById("graf");
+                        responseDiv.innerHTML = response.result;
+                        rodarScripts(responseDiv)
+                    } else {
+                        // Handle any errors here
+                    }
+                };
+                xhrGf.send();
+            }
+
+            load_grafico_vendas();
+        </script>
     </div>
+
     <div id="localizacao" class="tab-pane fade active" style="width: 100%;">
         <div style="padding: 10px;">
             <select class="form-select" aria-label="Selecionar mapa" onchange="updateURL(this.value)">

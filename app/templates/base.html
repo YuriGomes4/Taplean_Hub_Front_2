@@ -24,6 +24,43 @@
           eval(scripts[i].innerHTML);
         }
       }
+
+      // Check if the 'prefs' cookie exists
+      if (getCookie('prefs')) {
+        // Cookie exists, do something
+        console.log('Cookie exists');
+      } else {
+
+        var token = getCookie('token');
+
+        var xhr2 = new XMLHttpRequest();
+        xhr2.open("GET", "{{ base_url }}/api/v1/usuario/preferences", true);
+        xhr2.setRequestHeader("x-access-token", token);
+        xhr2.onreadystatechange = function() {
+          if (xhr2.readyState === 4) {
+            if (xhr2.status === 200) {
+              // Requisição bem sucedida
+              //console.error(xhr.responseText);
+              var responseJson = JSON.parse(xhr2.responseText); // Parse the response as JSON
+              var prefs = JSON.stringify(responseJson.result); // Save the JSON as a string
+              setCookie('prefs', prefs);
+            } else {
+              // Ocorreu um erro na requisição
+              console.error('Erro:', xhr2.status);
+              // console.error(xhr.responseText);
+            }
+          }
+        };
+        xhr2.onerror = function() {
+          console.error('Erro:', xhr2.statusText);
+        };
+        xhr2.send();
+        // Cookie does not exist, do something else
+      }
+      </script>
+      
+
+      
     </script>
     <div class="d-flex flex-row flex-grow-1">
       <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 100vh; position: fixed;">

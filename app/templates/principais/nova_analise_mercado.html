@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div style="padding: 10px;">
+
+    <h1>Criar uma análise de mercado</h1>
+
+    <div class="mb-3">
+        <label for="nome_pesquisa" class="form-label">Qual o nome da sua análise?</label>
+        <div class="input-group">
+            <input id="nome_pesquisa" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+        </div>
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio1" checked>
+        <label id="radio1_label" class="form-check-label" for="radio1">Escolher os produtos (pesquisando ou por categoria)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio2" disabled>
+        <label id="radio2_label" class="form-check-label" for="radio2">Profundidade de mercado (dos seus produtos)</label>
+    </div>
+
+    <div class="mb-3">
+        <label for="imposto_medio" class="form-label">Imposto médio</label>
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input id="imposto_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="custo_embalagem" class="form-label">Custo de embalagem</label>
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input id="custo_embalagem" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="frete_medio" class="form-label">Frete médio</label>
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input id="frete_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+        </div>
+    </div>
+
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" onclick='criar_analise()'>Criar a análise de mercado</button>
+    </div>
+
+    <script>
+        function criar_analise() {
+            dict_tipo = {
+                "Escolher os produtos (pesquisando ou por categoria)": "categoria",
+                "Profundidade de mercado (dos seus produtos)": "meus anuncios"
+            }
+
+            var radios = document.getElementsByName('flexRadioDefault');
+
+            for (var i = 0, length = radios.length; i < length; i++) {
+                if (radios[i].checked) {
+                    // do whatever you want with the checked radio
+                    tipo = document.getElementById(radios[i].id + "_label").textContent;
+                    // only one radio can be logically checked, don't check the rest
+                    console.log(tipo);
+                    break;
+                }
+            }
+
+            var nome_pesquisa = document.getElementById("nome_pesquisa").value;
+            var imposto_medio = document.getElementById("imposto_medio").value;
+            var custo_embalagem = document.getElementById("custo_embalagem").value;
+            var frete_medio = document.getElementById("frete_medio").value;
+
+            pesquisa_json = {
+                "nome": nome_pesquisa,
+                "tipo": dict_tipo[tipo],
+                "vendedor": JSON.parse(getCookie("prefs").replace(/'/g, '"')).vendedor,
+                "configuracoes": {
+                    "imposto": imposto_medio,
+                    "embalagem": custo_embalagem,
+                    "frete_medio": frete_medio
+                }
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{{ base_url }}/api/v1/pesquisa_mercado", true);
+            xhr.setRequestHeader("x-access-token", getCookie("token"));
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Requisição bem sucedida
+                        //console.error(xhr.responseText);
+                        var responseJson = JSON.parse(xhr.responseText); // Parse the response as JSON
+                        window.location.href = "/analise_mercado/" + responseJson.pesquisa.id; // Redirect to the home page
+                    } else {
+                        // Ocorreu um erro na requisição
+                        console.error('Erro:', xhr.status);
+                        // console.error(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = function() {
+                console.error('Erro:', xhr.statusText);
+            };
+            xhr.send(JSON.stringify(pesquisa_json));
+        }
+    </script>
+
+</div>
+
+{% endblock %}

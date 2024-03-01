@@ -1,1 +1,44 @@
 {% extends 'base.html' %}
+
+{% block body %}
+<div style="padding: 10px;">
+    <h1>Análises de mercado</h1>
+    <div id="lista_analises">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border m-5" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" onclick="window.location.href='/analise_mercado/nova'">Criar uma análise de mercado</button>
+    </div>
+
+    <script>
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado", true);
+        xhr.setRequestHeader("x-access-token", getCookie("token"));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText).result;
+                // Manipulate response data here
+                listaAnalises = document.getElementById("lista_analises");
+
+                listaAnalises.className = "list-group";
+                listaAnalises.innerHTML = "";
+
+                for (var analise in response) {
+                    var link = document.createElement("a");
+                    link.href = "/analise_mercado/" + response[analise].id;
+                    link.className = "list-group-item list-group-item-action";
+                    link.textContent = response[analise].nome;
+                    listaAnalises.appendChild(link);
+                }
+            }
+        };
+        xhr.send();
+    </script>
+</div>
+{% endblock %}
