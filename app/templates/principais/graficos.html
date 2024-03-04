@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.1/css/dataTables.dataTables.css"/>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
+{% endblock %}
+
 {% block body %}
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -109,8 +115,8 @@
                     <table id="tabela_vendas" class="sortable invisible display table table-striped table-bordered table-sm" style="width:100%">
                         <thead>
                             <tr>
-                                <th><button>Estados<span aria-hidden="true"></span></button></th>
-                                <th aria-sort="ascending" class="num"><button>Vendas<span aria-hidden="true"></span></button></th>
+                                <th>Estados</th>
+                                <th>Vendas</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,8 +124,9 @@
                     </table>
         
                     <script>
+                        
                         function load_grafico_localizacao_e_tabela() {
-            
+                            
                             const currentURL = new URL(window.location.href);
                             var sigla_mapa = null;
                             if (currentURL.searchParams.has('mapa')) {
@@ -127,7 +134,7 @@
                             } else {
                                 sigla_mapa = 'br';
                             }
-            
+                            
                             var xhr = new XMLHttpRequest();
                             xhr.open('GET', '{{ base_url }}/api/v1/vendas/'+JSON.parse(getCookie('prefs').replace(/'/g, '"')).vendedor+'/mapa/localizacao/'+sigla_mapa+'?framework=plotly', true);
                             xhr.setRequestHeader('x-access-token', getCookie('token'));
@@ -138,7 +145,7 @@
                                     responseDiv = document.getElementById("responseDiv");
                                     responseDiv.innerHTML = response.result;
                                     rodarScripts(responseDiv)
-            
+                                    
                                     var tableBody = document.querySelector("#tabela_vendas tbody");
                                     tableBody.innerHTML = ""; // Clear existing table rows
                                     
@@ -156,7 +163,8 @@
                                         
                                         tableBody.appendChild(row);
                                     }
-            
+                                    
+                                    new DataTable('#tabela_vendas');
                                     document.querySelector("#tabela_vendas").classList.remove("invisible");
                                 } else {
                                     // Handle any errors here

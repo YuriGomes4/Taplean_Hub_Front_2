@@ -1,7 +1,446 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.1/css/dataTables.dataTables.css"/>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
+{% endblock %}
+
 {% block body %}
-<div style="padding: 10px;">
-    
+
+<h1 id="h1_titulo">Análise de mercado</h1>
+
+<ul id="navTabs" class="nav nav-tabs">
+    <!--<li class="nav-item">
+        <a class="nav-link tabgraf active" aria-current="page" data-toggle="#vendas" onclick="changeTab(event)">Vendas</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link tabgraf" data-toggle="#localizacao" onclick="changeTab(event)">Localização</a>
+    </li>-->
+</ul>
+
+<div id="tab_content" class="tab-content">
+    <!--<div id="vendas" class="tab-pane fade active show" style="width: 100%;">
+        <div style="padding: 10px;">
+            <table id="myTable" class="display" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Row 1 Data 1</td>
+                        <td>Row 1 Data 2</td>
+                    </tr>
+                    <tr>
+                        <td>Row 2 Data 1</td>
+                        <td>Row 2 Data 2</td>
+                    </tr>
+                </tbody>
+            </table>
+        
+        </div>
+    </div>
+    <div id="vendas" class="tab-pane fade active show" style="width: 100%;">
+        <div style="padding: 10px;">
+        </div>
+    </div>-->
 </div>
+
+<script>
+
+    function load_pesquisa() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
+        xhr.setRequestHeader('x-access-token', getCookie('token'));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var pesquisa = JSON.parse(xhr.responseText).result;
+
+                    var h1_titulo = document.getElementById('h1_titulo');
+                    h1_titulo.textContent = "Análise de mercado - "+pesquisa['nome'];
+
+                    var dict_listing = {
+                        'gold_pro': 'Premium',
+                        'gold_premium': 'Diamante',
+                        'gold_special': 'Clássico',
+                        'gold': 'Ouro',
+                        'silver': 'Prata',
+                        'bronze': 'Bronze',
+                        'free': 'Gratuíto',
+                    };
+
+                    if (pesquisa['tipo'] === "categoria") {
+                        if (pesquisa['produtos'].includes(",")) {
+                            var produtos = pesquisa['produtos'].split(',');
+                            var categorias = pesquisa['categorias'].split(',');
+                            var range_vendas = pesquisa['range_vendas'].split(',');
+                            var tempo_vida = pesquisa['tempo_vida'].split(',');
+                            var m_visitas_diarias = pesquisa['m_visitas_diarias'].split(',');
+                            var preco_venda = pesquisa['preco_venda'].split(',');
+                            var tipo_anuncio = pesquisa['tipo_anuncio'].split(',');
+                            var taxa_fixa = pesquisa['taxa_fixa'].split(',');
+                            var comissao = pesquisa['comissao'].split(',');
+                            var titulo = pesquisa['titulo'].split('$@$');
+                            var link = pesquisa['link'].split(',');
+                            var frete_gratis = pesquisa['frete_gratis'].split(',');
+                            var custo_frete = pesquisa['custo_frete'].split(',');
+                        } else if (pesquisa['produtos'] !== "" && pesquisa['produtos'] !== "None" && pesquisa['produtos'] !== null) {
+                            var produtos = [pesquisa['produtos']];
+                            var categorias = [pesquisa['categorias']];
+                            var range_vendas = [pesquisa['range_vendas']];
+                            var tempo_vida = [pesquisa['tempo_vida']];
+                            var m_visitas_diarias = [pesquisa['m_visitas_diarias']];
+                            var preco_venda = [pesquisa['preco_venda']];
+                            var tipo_anuncio = [pesquisa['tipo_anuncio']];
+                            var taxa_fixa = [pesquisa['taxa_fixa']];
+                            var comissao = [pesquisa['comissao']];
+                            var titulo = [pesquisa['titulo']];
+                            var link = [pesquisa['link']];
+                            var frete_gratis = [pesquisa['frete_gratis']];
+                            var custo_frete = [pesquisa['custo_frete']];
+                        } else {
+                            var produtos = [];
+                        }
+
+
+
+                        var configuracoes = pesquisa['configuracoes'];
+
+                        if (produtos.length > 0) {
+                            var cats = {};
+
+                            var cat_ids = [];
+
+                            for (var cat in categorias) {
+                                var cat = categorias[cat];
+                                // se car não estiver em cats
+                                if (!(cat_ids.includes(cat))) {
+                                    // Adicionar cat em cat_ids
+                                    cat_ids.push(cat);
+                                }
+
+                            }
+
+                            var xhr2 = new XMLHttpRequest();
+                            xhr2.open('GET', '{{ base_url }}/api/v1/meli/categoria?id='+cat_ids.join(','), true);
+                            xhr2.setRequestHeader('x-access-token', getCookie('token'));
+                            xhr2.onreadystatechange = function() {
+                                if (xhr2.readyState === 4) {
+                                    if (xhr2.status === 200) {
+                                        var respCategorias = JSON.parse(xhr2.responseText).result;
+
+                                        if (categorias.length > 1) {
+                                            for (var cat in respCategorias) {
+                                                var cat = respCategorias[cat].json;
+                                                cats[cat['id']] = cat['name'];
+                                            }
+                                        } else {
+                                            cats[respCategorias['id']] = respCategorias['name'];
+                                        }
+
+                                        var ativada = false;
+
+                                        for (var tab in document.querySelectorAll('.tab-pane.fade')) {
+                                            var tab = document.querySelectorAll('.tab-pane.fade')[tab];
+                                            if (tab && tab.classList && tab.classList.contains("show")) {
+                                                ativada = true;
+                                            }
+                                        }
+                                        
+                                        var tabcontent = document.getElementById('tab_content');
+                                        var navTabs = document.getElementById('navTabs');
+
+                                        for (var cat in cats) {
+                                            var catId = cat;
+                                            var cat = cats[cat];
+                                            var div = document.createElement('div');
+                                            div.classList.add('tab-pane');
+                                            div.classList.add('fade');
+                                            //div.classList.add('active');
+                                            if (!ativada) {
+                                                div.classList.add('show');
+                                                div.classList.add('active');
+                                                //div.style.visibility = 'visible';
+                                                //div.style.height = 'auto';
+                                                navtab = '<li class="nav-item"><a class="nav-link tabgraf active" aria-current="page" data-toggle="#'+catId+'" onclick="changeTab(event)">'+cat+'</a></li>';
+                                                ativada = true;
+                                            } else {
+                                                //div.style.visibility = 'hidden';
+                                                //div.style.height = '0';
+                                                navtab = '<li class="nav-item"><a class="nav-link tabgraf" aria-current="page" data-toggle="#'+catId+'" onclick="changeTab(event)">'+cat+'</a></li>';
+                                            }
+                                            div.id = catId;
+                                            div.style.width = '100rem';
+                                            div.style.padding = '10px';
+
+                                            var table = document.createElement('table');
+
+                                            var thead = document.createElement('thead');
+                                            var tr = document.createElement('tr');
+                                            var th_anuncio = document.createElement('th');
+                                            var th_titulo = document.createElement('th');
+                                            var th_custo = document.createElement('th');
+                                            var th_media_fat_mes = document.createElement('th');
+                                            var th_media_qnt_mes = document.createElement('th');
+                                            var th_media_visitas_d = document.createElement('th');
+                                            //var th_separador = document.createElement('th');
+                                            var th_preco = document.createElement('th');
+                                            var th_tipo = document.createElement('th');
+                                            var th_frete_gratis = document.createElement('th');
+                                            var th_taxa_fixa = document.createElement('th');
+                                            var th_comissao = document.createElement('th');
+                                            var th_imposto = document.createElement('th');
+                                            var th_frete = document.createElement('th');
+                                            var th_embalagem = document.createElement('th');
+                                            var th_liquido = document.createElement('th');
+                                            var th_lucro = document.createElement('th');
+                                            var th_per_custo = document.createElement('th');
+                                            var th_per_venda = document.createElement('th');
+                                            th_anuncio.textContent = "Anúncio";
+                                            th_titulo.textContent = "Título";
+                                            th_custo.textContent = "Custo sugestão";
+                                            th_media_fat_mes.textContent = "Média fat/mês";
+                                            th_media_qnt_mes.textContent = "Média qnt/mês";
+                                            th_media_visitas_d.textContent = "Média visitas/dia";
+                                            //th_separador.textContent = " ";
+                                            th_preco.textContent = "Preço";
+                                            th_tipo.textContent = "Tipo anúncio";
+                                            th_frete_gratis.textContent = "Frete grátis";
+                                            th_taxa_fixa.textContent = "Taxa fixa";
+                                            th_comissao.textContent = "Comissão";
+                                            th_imposto.textContent = "Imposto";
+                                            th_frete.textContent = "Frete";
+                                            th_embalagem.textContent = "Emb.";
+                                            th_liquido.textContent = "líquido";
+                                            th_lucro.textContent = "Lucro";
+                                            th_per_custo.textContent = "% Custo";
+                                            th_per_venda.textContent = "% Venda";
+                                            tr.appendChild(th_anuncio);
+                                            tr.appendChild(th_titulo);
+                                            tr.appendChild(th_custo);
+                                            tr.appendChild(th_media_fat_mes);
+                                            tr.appendChild(th_media_qnt_mes);
+                                            tr.appendChild(th_media_visitas_d);
+                                            //tr.appendChild(th_separador);
+                                            tr.appendChild(th_preco);
+                                            tr.appendChild(th_tipo);
+                                            tr.appendChild(th_frete_gratis);
+                                            tr.appendChild(th_taxa_fixa);
+                                            tr.appendChild(th_comissao);
+                                            tr.appendChild(th_imposto);
+                                            tr.appendChild(th_frete);
+                                            tr.appendChild(th_embalagem);
+                                            tr.appendChild(th_liquido);
+                                            tr.appendChild(th_lucro);
+                                            tr.appendChild(th_per_custo);
+                                            tr.appendChild(th_per_venda);
+                                            thead.appendChild(tr);
+                                            table.appendChild(thead);
+
+                                            var tbody = document.createElement('tbody');
+
+                                            for (var prod in produtos) {
+                                                //var prod = produtos[prod];
+                                                if (categorias[prod] === catId) {
+                                                    var tr = document.createElement('tr');
+                                                    var td_anuncio = document.createElement('td');
+                                                    var td_titulo = document.createElement('td');
+                                                    var td_custo = document.createElement('td');
+                                                    var td_media_fat_mes = document.createElement('td');
+                                                    var td_media_qnt_mes = document.createElement('td');
+                                                    var td_media_visitas_d = document.createElement('td');
+                                                    //var td_separador = document.createElement('td');
+                                                    var td_preco = document.createElement('td');
+                                                    var td_tipo = document.createElement('td');
+                                                    var td_frete_gratis = document.createElement('td');
+                                                    var td_taxa_fixa = document.createElement('td');
+                                                    var td_comissao = document.createElement('td');
+                                                    var td_imposto = document.createElement('td');
+                                                    var td_frete = document.createElement('td');
+                                                    var td_embalagem = document.createElement('td');
+                                                    var td_liquido = document.createElement('td');
+                                                    var td_lucro = document.createElement('td');
+                                                    var td_per_custo = document.createElement('td');
+                                                    var td_per_venda = document.createElement('td');
+
+                                                    var media_qnt_mes = ((parseFloat(range_vendas[prod])/parseFloat(tempo_vida[prod]))*30).toFixed(0);
+                                                    var media_fat_mes = (media_qnt_mes*parseFloat(preco_venda[prod])).toFixed(2);
+
+                                                    var prodImposto = ((parseFloat(configuracoes.frete_medio)*(parseFloat(configuracoes.imposto)/100))+(parseFloat(preco_venda[prod])*(parseFloat(configuracoes.imposto)/100))).toFixed(2);
+
+                                                    
+                                                    var prodLiquido = (parseFloat(preco_venda[prod]) - parseFloat(comissao[prod]) - parseFloat(custo_frete[prod]) - prodImposto - parseFloat(taxa_fixa[prod]) - parseFloat(configuracoes.embalagem)).toFixed(2);
+                                                    
+                                                    
+                                                    var lucro_desejado = 0.20*parseFloat(preco_venda[prod]);
+                                                    
+                                                    var custo_sug = (prodLiquido - lucro_desejado).toFixed(2);
+                                                    
+                                                    var lucro = prodLiquido - custo_sug;
+                                                    
+                                                    td_anuncio.innerHTML = '<a href="'+link[prod]+'" target="_blank">Ver anúncio</a>';
+                                                    td_titulo.textContent = titulo[prod];
+                                                    //td_titulo.style.whiteSpace = "nowrap";
+                                                    //td_titulo.style.overflow = "auto";
+                                                    //td_titulo.style.textOverflow = "ellipsis";
+                                                    td_custo.textContent = custo_sug;
+                                                    td_media_fat_mes.textContent = media_fat_mes;
+                                                    td_media_qnt_mes.textContent = media_qnt_mes;
+                                                    td_media_visitas_d.textContent = m_visitas_diarias[prod];
+                                                    //td_separador.textContent = " ";
+                                                    td_preco.textContent = preco_venda[prod];
+                                                    td_tipo.textContent = dict_listing[tipo_anuncio[prod]];
+                                                    if (frete_gratis[prod] === "true") {
+                                                        td_frete_gratis.innerHTML = '<input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..." disabled>';
+                                                    } else {
+                                                        td_frete_gratis.innerHTML = '<input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..." checked disabled>';
+                                                    }
+                                                    //td_frete_gratis.textContent = frete_gratis[prod];
+                                                    td_taxa_fixa.textContent = taxa_fixa[prod];
+                                                    td_comissao.textContent = parseFloat(comissao[prod]).toFixed(2);
+                                                    td_imposto.textContent = prodImposto;
+                                                    td_frete.textContent = custo_frete[prod];
+                                                    td_embalagem.textContent = configuracoes.embalagem;
+                                                    td_liquido.textContent = prodLiquido;
+                                                    td_lucro.textContent = lucro.toFixed(2);
+                                                    td_per_custo.textContent = ((lucro/custo_sug)*100).toFixed(0)+'%';
+                                                    td_per_venda.textContent = ((lucro/preco_venda[prod])*100).toFixed(0)+'%';
+                                                    tr.appendChild(td_anuncio);
+                                                    tr.appendChild(td_titulo);
+                                                    tr.appendChild(td_custo);
+                                                    tr.appendChild(td_media_fat_mes);
+                                                    tr.appendChild(td_media_qnt_mes);
+                                                    tr.appendChild(td_media_visitas_d);
+                                                    //tr.appendChild(td_separador);
+                                                    tr.appendChild(td_preco);
+                                                    tr.appendChild(td_tipo);
+                                                    tr.appendChild(td_frete_gratis);
+                                                    tr.appendChild(td_taxa_fixa);
+                                                    tr.appendChild(td_comissao);
+                                                    tr.appendChild(td_imposto);
+                                                    tr.appendChild(td_frete);
+                                                    tr.appendChild(td_embalagem);
+                                                    tr.appendChild(td_liquido);
+                                                    tr.appendChild(td_lucro);
+                                                    tr.appendChild(td_per_custo);
+                                                    tr.appendChild(td_per_venda);
+                                                    tbody.appendChild(tr);
+                                                }
+                                            }
+
+                                            table.appendChild(tbody);
+
+                                            table.classList.add('display');
+                                            table.style.width = '100%';
+                                            table.id = 'table_'+catId;
+                                            table.style.fontSize = '14px';
+
+                                            div.appendChild(table);
+
+                                            navTabs.innerHTML += navtab
+                                            tabcontent.appendChild(div);
+
+                                            new DataTable('#table_'+catId);
+                                        }
+
+                                    }
+                                }
+                            };
+                            xhr2.send();
+
+                        }
+
+                    }
+
+                }
+
+            }
+        };
+        xhr.send();
+    }
+
+    load_pesquisa();
+</script>
+
+<div style="padding: 10px;">
+
+    <br>
+
+    <!-- Button trigger modal -->
+    <div class="d-grid gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Configurações da análise
+        </button>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Configurações da análise</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="imposto_medio" class="form-label">Imposto médio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input id="imposto_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="custo_embalagem" class="form-label">Custo de embalagem</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input id="custo_embalagem" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="frete_medio" class="form-label">Frete médio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input id="frete_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar mudanças</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeTab(event) {
+        const tabs = document.querySelectorAll('.nav-link.tabgraf');
+        const tabContent = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        tabContent.forEach(content => {
+            //content.classList.remove('active');
+            //content.style.height = '0';
+            //content.style.visibility = 'hidden';
+            content.classList.remove('show');
+            content.classList.remove('active');
+        });
+        
+        event.target.classList.add('active');
+        const targetTab = document.querySelector(event.target.getAttribute('data-toggle'));
+        targetTab.classList.add('active');
+        targetTab.classList.add('show');
+        //targetTab.style.height = 'auto';
+        //targetTab.style.visibility = 'visible';
+    }
+</script>
 {% endblock %}
