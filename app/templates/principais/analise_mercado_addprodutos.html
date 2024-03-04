@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div style="padding: 10px;">
+    <select id="opt-select" class="form-select" aria-label="Como você quer adicionar so produtos?" onchange="onChangeSelect()">
+        <option selected value="selecione">Selecione</option>
+        <option value="mais-vendidos">Mais vendidos de uma categoria</option>
+        <option value="pesquisando">Pesquisando</option>
+        <option value="por-link">Por link do anúncio</option>
+    </select>
+
+</div>
+
+<div id="div-principal" style="padding: 10px;">
+</div>
+
+<script>
+    function onChangeSelect() {
+        var optSelect = document.getElementById("opt-select");
+        var divPrincipal = document.getElementById("div-principal");
+
+        if (optSelect.value === "selecione") {
+            divPrincipal.innerHTML = ``;
+        } else if (optSelect.value === "mais-vendidos") {
+            var categId = "";
+            if (document.getElementById("categ-atual")) {
+                var categAtual = document.getElementById("categ-atual");
+
+                categId = categAtual.value;
+
+                categAtual.id = "categ-"+categId;
+
+            }
+
+            if (categId !== "") {
+                if (categId !== "pare-aqui") {
+    
+                } else {
+                    var select = document.createElement("select");
+                    select.id = "categ-atual";
+                    select.className = "form-select";
+                    select.setAttribute("aria-label", "Selecione a categoria");
+                    select.setAttribute("onchange", "onChangeSelect()");
+
+                    var option = document.createElement("option");
+                    option.value = "selecione";
+                    option.textContent = "Selecione";
+                    option.selected = true;
+                    select.appendChild(option);
+
+                    var option = document.createElement("option");
+                    option.value = "pare-aqui";
+                    option.textContent = "Pare aqui";
+                    select.appendChild(option);
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "{{ base_url }}/api/v1/meli/categoria?id="+categId, true);
+                    xhr.setRequestHeader("x-access-token", getCookie("token"));
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            var response = JSON.parse(xhr.responseText).result;
+                            // Manipulate response data here
+                            var filhos = response.children_categories;
+
+                            for (var filho in filhos) {
+                                var filho = filhos[filho];
+                                var option = document.createElement("option");
+                                option.value = filho.id;
+                                option.textContent = filho.name;
+                                select.appendChild(option);
+                            }
+                        }
+                    };
+                }
+            }
+
+
+            divPrincipal.innerHTML = ``;
+        } else if (optSelect.value === "pesquisando") {
+            divPrincipal.innerHTML = ``;
+        }
+    }
+</script>
+
+{% endblock %}

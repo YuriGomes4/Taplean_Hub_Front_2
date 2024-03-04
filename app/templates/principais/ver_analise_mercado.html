@@ -111,6 +111,14 @@
 
                         var configuracoes = pesquisa['configuracoes'];
 
+                        var md_imposto_medio = document.getElementById('md_imposto_medio');
+                        var md_custo_embalagem = document.getElementById('md_custo_embalagem');
+                        var md_frete_medio = document.getElementById('md_frete_medio');
+
+                        md_imposto_medio.value = configuracoes.imposto;
+                        md_custo_embalagem.value = configuracoes.embalagem;
+                        md_frete_medio.value = configuracoes.frete_medio;
+
                         if (produtos.length > 0) {
                             var cats = {};
 
@@ -365,11 +373,37 @@
     }
 
     load_pesquisa();
+
+    function salvar_config() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('x-access-token', getCookie('token'));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    toast('Configurações salvas', 'As configurações da análise foram salvas com sucesso.', 'Agora');
+                }
+            }
+        };
+        xhr.send(JSON.stringify({"configuracoes": {
+            "imposto": parseFloat(document.getElementById('md_imposto_medio').value),
+            "embalagem": parseFloat(document.getElementById('md_custo_embalagem').value),
+            "frete_medio": parseFloat(document.getElementById('md_frete_medio').value)
+        }}));
+    
+    }
 </script>
 
 <div style="padding: 10px;">
 
     <br>
+
+    <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/analise_mercado/{{ id_pesquisa }}/addprodutos'">
+            Adicionar produtos a pesquisa de mercado
+        </button>
+    </div>
 
     <!-- Button trigger modal -->
     <div class="d-grid gap-2">
@@ -390,32 +424,33 @@
                     <div class="mb-3">
                         <label for="imposto_medio" class="form-label">Imposto médio</label>
                         <div class="input-group">
-                            <span class="input-group-text">R$</span>
-                            <input id="imposto_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                            <input id="md_imposto_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                            <span class="input-group-text">%</span>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="custo_embalagem" class="form-label">Custo de embalagem</label>
                         <div class="input-group">
                             <span class="input-group-text">R$</span>
-                            <input id="custo_embalagem" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                            <input id="md_custo_embalagem" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="frete_medio" class="form-label">Frete médio</label>
                         <div class="input-group">
                             <span class="input-group-text">R$</span>
-                            <input id="frete_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                            <input id="md_frete_medio" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Salvar mudanças</button>
+                    <button type="button" class="btn btn-primary" onclick="salvar_config()">Salvar mudanças</button>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <script>

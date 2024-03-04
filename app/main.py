@@ -124,6 +124,12 @@ def ver_analise_mercado(id_pesquisa):
     pagina = "analise_mercado"
     return render_template("principais/ver_analise_mercado.html", base_url=base_url, pagina=pagina, id_pesquisa=id_pesquisa)
 
+@app.route("/analise_mercado/<string:id_pesquisa>/addprodutos")
+@token_required
+def analise_mercado_addprodutos(id_pesquisa):
+    pagina = "analise_mercado"
+    return render_template("principais/analise_mercado_addprodutos.html", base_url=base_url, pagina=pagina, id_pesquisa=id_pesquisa)
+
 @app.route("/conta")
 @token_required
 def conta():
