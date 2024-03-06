@@ -130,6 +130,37 @@
         }
     }
 
+    async function add_product(tbody, produto) {
+        //var tr = document.createElement("tr");
+
+        var tbodyy = document.querySelector("tbody");
+
+        //"%Y-%m-%dT%H:%M:%S.%fZ"
+        var data_criacao = new Date(produto.date_created);
+        var data_atual = new Date();
+        var tempo_vida = Math.round((data_atual - data_criacao) / (1000 * 60 * 60 * 24))
+        var visitas_totais = 0;
+        for (var i = 0; i < produto.visitas.length; i++) {
+            visitas_totais += produto.visitas[i];
+        }
+        var media_visitas = (visitas_totais / produto.visitas.length).toFixed();
+        tbodyy.innerHTML += `
+        <tr>
+            <td><a href="${produto.permalink}" target="_blank">Ver</a></td>
+            <td><img src="${produto.pictures[0].secure_url}" alt="Imagem do produto" width="70" height="70"></td>
+            <td>${produto.title}</td>
+            <td>${produto.price}</td>
+            <td>${tempo_vida} dias</td>
+            <td>${produto.range_vendas}</td>
+            <td>${((produto.range_vendas/tempo_vida)*30).toFixed()}</td>
+            <td>${media_visitas}</td>
+            <td><button type="button" class="btn btn-primary" onclick="addProduct(${produto.id})">Adicionar</button></td>
+        </tr>
+        `;
+
+        //tbodyy.innerHTML += tr.outerHTML;
+    }
+
     function load_products(valor) {
         var divPrincipal = document.getElementById("div-principal");
 
@@ -138,6 +169,31 @@
         loading.setAttribute("role", "status");
         loading.innerHTML = `<span class="visually-hidden">Loading...</span>`;
         divPrincipal.appendChild(loading);
+
+        var table = document.createElement("table");
+        table.className = "table table-striped";
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th scope="col">Ver</th>
+                    <th scope="col">Imagem</th>
+                    <th scope="col">Título</th>
+                    <th scope="col">Preço venda</th>
+                    <th scope="col">Tempo vida</th>
+                    <th scope="col">Range vendas</th>
+                    <th scope="col">Vendas mês</th>
+                    <th scope="col">Visitas diarias</th>
+                    <th scope="col">Variação visitas</th>
+                    <th scope="col">Adicionar</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        `;
+        
+        divPrincipal.appendChild(table);
+
+        tbody = table.querySelector("tbody");
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado/maisvendidos/"+valor+"?pesquisa={{ id_pesquisa }}", true);
@@ -148,44 +204,27 @@
                 // Manipulate response data here
                 var produtos = response.content;
 
-                var table = document.createElement("table");
-                table.className = "table table-striped";
-                table.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Preço</th>
-                            <th scope="col">Estoque</th>
-                            <th scope="col">Vendidos</th>
-                            <th scope="col">Adicionar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                `;
-
                 for (var produto in produtos) {
-                    var produto = produtos[produto];
-                    var tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <th scope="row">${produto.id}</th>
-                        <td>${produto.title}</td>
-                        <td>${produto.price}</td>
-                        <td>${produto.available_quantity}</td>
-                        <td>${produto.sold_quantity}</td>
-                        <td><button type="button" class="btn btn-primary" onclick="addProduct(${produto.id})">Adicionar</button></td>
-                    `;
-                    table.querySelector("tbody").appendChild(tr);
+                    var xhrp = new XMLHttpRequest();
+                    xhrp.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+produtos[produto].id+"?range_vendas=true&visitas=30", false);
+                    xhrp.setRequestHeader("x-access-token", getCookie("token"));
+                    xhrp.onreadystatechange = function() {
+                        if (xhrp.readyState === 4 && xhrp.status === 200) {
+                            var response = JSON.parse(xhrp.responseText).result;
+                            // Manipulate response data here
+                            var produto = response;
+
+                            add_product(tbody, produto);
+
+                        }
+                    };
+                    xhrp.send();
                 }
 
                 loading.remove();
-
-                divPrincipal.appendChild(table);
             }
         };
         xhr.send();
-
     }
 </script>
 
