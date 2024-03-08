@@ -142,7 +142,6 @@
                 loading.setAttribute("role", "status");
                 loading.innerHTML = `<span class="visually-hidden">Loading...</span>`;
                 divPrincipal.appendChild(loading);
-
                 
                 var xhr = new XMLHttpRequest();
                 if (categId === "") {
@@ -209,8 +208,106 @@
 
             //divPrincipal.innerHTML = ``;
         } else if (optSelect.value === "pesquisando") {
-            divPrincipal.innerHTML = ``;
+            //divPrincipal.innerHTML = ``;
+            //<div id="pesquisa" class="input-group mb-3">
+            //    <input id="input_search" type="text" class="form-control" placeholder="Pesquise pelo produto" aria-label="Pesquise pelo produto" aria-describedby="button-search">
+            //    <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="load_produtos()">Pesquisar</button>
+            //</div>
+            var div = document.createElement("div");
+            div.id = "pesquisa";
+            div.className = "input-group mb-3";
+            div.innerHTML = `
+                <input id="input_search" type="text" class="form-control" placeholder="Pesquise pelo produto" aria-label="Pesquise pelo produto" aria-describedby="button-search">
+                <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="pesquisar_produto()">Pesquisar</button>
+            `;
+            divPrincipal.appendChild(div);
+        } else if (optSelect.value === "por-link") {
+            var div = document.createElement("div");
+            div.id = "pesquisa";
+            div.className = "input-group mb-3";
+            div.innerHTML = `
+                <input id="input_search" type="text" class="form-control" placeholder="https://produto.mercadolivre.com.br/MLB-2222222222-titulo-do-produto-_JM" aria-label="Cole o link do anúncio" aria-describedby="button-search">
+                <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="add_product()">Pesquisar</button>
+            `;
+            divPrincipal.appendChild(div);
+
+            load_products();
         }
+    }
+
+    function pesquisar_produto() {
+
+        // apagar todas as tabelas e botoes
+        var all_tables = document.querySelectorAll("table");
+        for (var i = 0; i < all_tables.length; i++) {
+            all_tables[i].remove();
+        }
+        var all_buttons = document.querySelectorAll(".addbutton");
+        for (var i = 0; i < all_buttons.length; i++) {
+            all_buttons[i].remove();
+        }
+        var all_loadings = document.querySelectorAll('.spinner-border');
+        for (var i = 0; i < all_loadings.length; i++) {
+            all_loadings[i].remove();
+        }
+        worker.terminate();
+        worker = new Worker("{{ url_for('static', filename='js/web_worker.js') }}");
+
+        worker.addEventListener('message', function(e) {
+            var dados = e.data;
+            if (dados.funcao === "add_products") {
+                var tbodyy = document.querySelector("tbody");
+                var tr = document.createElement("tr");
+                tr.id = dados.id;
+                tr.innerHTML = dados.innerhtml;
+                tbodyy.appendChild(tr);
+            }
+        });
+
+        load_products();
+
+    }
+
+    function add_product() {
+
+        var inpuSearch = document.getElementById("input_search");
+
+        var link = inpuSearch.value;
+
+        if (link !== "") {
+
+            var xhrlk = new XMLHttpRequest();
+            xhrlk.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pegarmlb?link="+link, true);
+            xhrlk.setRequestHeader("x-access-token", getCookie("token"));
+            xhrlk.onreadystatechange = function() {
+                if (xhrlk.readyState === 4) {
+                    if (xhrlk.status === 200){
+                        var response = JSON.parse(xhrlk.responseText).result;
+
+                        if (document.getElementById(response)) {
+                            toast("Produto já adicionado");
+                        } else {
+
+                            var produtos = [{'id': response}];
+        
+                            console.log(produtos);
+        
+                            worker.postMessage({ funcao:"add_products", valor:[produtos, getCookie("token"), "{{ base_url }}"] }); // assíncrono - retorna imediatamente
+
+                            inpuSearch.value = "";
+                        }
+                    } else {
+                        toast("Erro ao buscar anúncio");
+                    }
+
+                }
+            };
+            xhrlk.send();
+
+        } else {
+            toast("Link vazio");
+        }
+
     }
 
     function add_products() {
@@ -238,7 +335,7 @@
                 produtos.push(all_trs[i].id);
                 categorias.push(infos.attributes.getNamedItem("categoria").value);
                 range_vendas.push(all_trs[i].querySelector("#"+all_trs[i].id+"-range_vendas").textContent);
-                tempo_vida.push(all_trs[i].querySelector("#"+all_trs[i].id+"-tempo_vida").textContent);
+                tempo_vida.push((all_trs[i].querySelector("#"+all_trs[i].id+"-tempo_vida").textContent).replace(" dias", ""));
                 m_visitas_diarias.push(all_trs[i].querySelector("#"+all_trs[i].id+"-visitas_dia").textContent);
                 preco_venda.push(all_trs[i].querySelector("#"+all_trs[i].id+"-preco").textContent);
                 tipo_anuncio.push(infos.attributes.getNamedItem("tipo_anuncio").value);
@@ -280,7 +377,10 @@
         xhrap.send(JSON.stringify(data));
     }
 
-    function load_products(valor) {
+    function load_products(valor="") {
+
+        var optSelect = document.getElementById("opt-select");
+
         var divPrincipal = document.getElementById("div-principal");
 
         var loading = document.createElement("div");
@@ -313,7 +413,7 @@
         divPrincipal.appendChild(table);
 
         var button = document.createElement("button");
-        button.className = "btn btn-primary";
+        button.className = "btn btn-primary addbutton";
         button.type = "button";
         button.textContent = "Adicionar todos";
         button.setAttribute("onclick", "add_products()");
@@ -322,24 +422,40 @@
 
         tbody = table.querySelector("tbody");
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado/maisvendidos/"+valor+"?pesquisa={{ id_pesquisa }}", true);
-        xhr.setRequestHeader("x-access-token", getCookie("token"));
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText).result;
-                // Manipulate response data here
-                var produtos = response.content;
+        if (optSelect.value !== "por-link") {
 
-
-                //add_products(produtos);
-                worker.postMessage({ funcao:"add_products", valor:[produtos, getCookie("token"), "{{ base_url }}"] }); // assíncrono - retorna imediatamente
-
-
-                loading.remove();
+            var xhr = new XMLHttpRequest();
+            if (optSelect.value === "mais-vendidos") {
+                xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado/maisvendidos/"+valor+"?pesquisa={{ id_pesquisa }}", true);
+            } else if (optSelect.value === "pesquisando") {
+                xhr.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pesquisar?q="+document.getElementById("input_search").value, true);
             }
-        };
-        xhr.send();
+            //xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado/maisvendidos/"+valor+"?pesquisa={{ id_pesquisa }}", true);
+            xhr.setRequestHeader("x-access-token", getCookie("token"));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText).result;
+                    // Manipulate response data here
+                    if (optSelect.value === "mais-vendidos") {
+                        var produtos = response.content;
+                    } else if (optSelect.value === "pesquisando") {
+                        var produtos = response.results;
+                    }
+                    //var produtos = response.content;
+
+
+                    //add_products(produtos);
+                    worker.postMessage({ funcao:"add_products", valor:[produtos, getCookie("token"), "{{ base_url }}"] }); // assíncrono - retorna imediatamente
+
+
+                    loading.remove();
+                }
+            };
+            xhr.send();
+
+        } else {
+            loading.remove();
+        }
     }
 
 
