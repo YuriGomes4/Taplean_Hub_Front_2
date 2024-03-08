@@ -1,9 +1,19 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.1/css/dataTables.dataTables.css"/>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
+{% endblock %}
+
+
 {% block body %}
+
+<h1 class="h1">Produtos</h1>
+
 <div class="row" style="width: 100%;">
     <div class="col">
-        <div id="pesquisa" class="input-group mb-3">
+        <div id="pesquisa" class="input-group mb-3" style="visibility: hidden;">
             <input id="input_search" type="text" class="form-control" placeholder="Pesquise pelo produto" aria-label="Pesquise pelo produto" aria-describedby="button-search">
             <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="load_produtos()">Pesquisar</button>
         </div>
@@ -24,27 +34,23 @@
     </div>
 </div>
 
-<table class="table table-hover">
-    <thead id="cab_lista_vendas">
-        <tr>
-            <th>MLB</th>
-            <th>Titulo</th>
-            <th>Status</th>
-            <th>Qualidade</th>
-            <th>Líquido</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="lista_vendas">
-    </tbody>
-</table>
+<div id="div-principal">
+</div>
 
 <script>
     function load_produtos() {
 
-        var tableHead = document.getElementById("cab_lista_vendas");
+        var divPrincipal = document.querySelector("#div-principal");
 
-        tableHead.innerHTML = ""; // Clear existing table rows
+        var table = document.createElement("table");
+
+        table.id = "table-" + Math.floor(Math.random() * 9000 + 1000);
+        table.className = "table table-hover";
+        table.style.width = "100%";
+
+        var tableHead = table.createTHead();
+
+        //tableHead.innerHTML = ""; // Clear existing table rows
 
         row = document.createElement("tr");
 
@@ -77,6 +83,8 @@
 
         tableHead.appendChild(row);
 
+        table.appendChild(tableHead);
+
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ base_url }}/api/v1/produto/all?pesquisa="+document.getElementById('input_search').value+"&ordenacao="+document.getElementById('ordenacao').value+"&filtro="+document.getElementById('filtro').value, true);
         xhr.setRequestHeader("x-access-token", getCookie("token"));
@@ -84,8 +92,9 @@
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     var response = JSON.parse(xhr.responseText);
-                    var tableBody = document.querySelector("#lista_vendas");
-                    tableBody.innerHTML = ""; // Clear existing table rows
+                    var tableBody = table.createTBody();
+
+                    //tableBody.innerHTML = ""; // Clear existing table rows
 
                     for (var produto in response.result) {
                         var produto = response.result[produto];
@@ -125,7 +134,15 @@
                         row.appendChild(editarCell);
 
                         tableBody.appendChild(row);
+
+                        table.appendChild(tableBody);
+
+                        divPrincipal.innerHTML = "";
+
+                        divPrincipal.appendChild(table);
+
                     }
+                    new DataTable('#'+table.id);
                 } else {
                     // Handle any errors here
                 }
