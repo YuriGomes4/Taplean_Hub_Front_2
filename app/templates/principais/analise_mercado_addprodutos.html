@@ -3,6 +3,9 @@
 {% block body %}
 
 <div style="padding: 10px;">
+
+    <h1 id="h1_titulo">Adicionar produtos a pesquisa de mercado</h1>
+
     <select id="opt-select" class="form-select" aria-label="Como você quer adicionar so produtos?" onchange="onChangeSelect(this.id)">
         <option selected value="selecione">Selecione</option>
         <option value="mais-vendidos">Mais vendidos de uma categoria</option>
@@ -16,6 +19,39 @@
 </div>
 
 <script>
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
+    xhr.setRequestHeader('x-access-token', getCookie('token'));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var pesquisa = JSON.parse(xhr.responseText).result;
+
+                var h1_titulo = document.getElementById('h1_titulo');
+                h1_titulo.textContent += " - "+pesquisa['nome'];
+            }
+        }
+    };
+    xhr.send();
+
+    // Cria o web worker
+    var worker = new Worker("{{ url_for('static', filename='js/web_worker.js') }}");
+
+    // Diz o que fazer quando o web worker enviar uma mensagem
+    worker.addEventListener('message', function(e) {
+        var dados = e.data;
+        if (dados.funcao === "add_products") {
+            var tbodyy = document.querySelector("tbody");
+            var tr = document.createElement("tr");
+            tr.id = dados.id;
+            tr.innerHTML = dados.innerhtml;
+            tbodyy.appendChild(tr);
+            //tbodyy.innerHTML += dados.resultado;
+        }
+    });
+
+
     function onChangeSelect(elem_id) {
         var optSelect = document.getElementById("opt-select");
         var divPrincipal = document.getElementById("div-principal");
@@ -23,7 +59,22 @@
 
         if (elem_id === "opt-select") {
             divPrincipal.innerHTML = ``;
-        } else if (elem_id.includes("categ-MLB")) {
+            worker.terminate();
+            worker = new Worker("{{ url_for('static', filename='js/web_worker.js') }}");
+
+            worker.addEventListener('message', function(e) {
+                var dados = e.data;
+                if (dados.funcao === "add_products") {
+                    var tbodyy = document.querySelector("tbody");
+                    var tr = document.createElement("tr");
+                    tr.id = dados.id;
+                    tr.innerHTML = dados.innerhtml;
+                    tbodyy.appendChild(tr);
+                }
+            });
+        } else if (elem_id.includes("categ-MLB") || elem_id === "categ-selecione") {
+
+            var categAt = document.getElementById("categ-atual");
 
             var tmpSelect = document.querySelector('#'+elem_id);
 
@@ -34,53 +85,65 @@
                 }
             }
 
+            var table = document.querySelector("table");
+            if (table) {
+                table.remove();
+            }
+            var button = document.querySelector("button");
+            if (button) {
+                button.remove();
+            }
+            // remove all loadings
+            var all_loadings = divPrincipal.querySelectorAll('.spinner-border');
+            for (var i = 0; i < all_loadings.length; i++) {
+                all_loadings[i].remove();
+            }
+            worker.terminate();
+            worker = new Worker("{{ url_for('static', filename='js/web_worker.js') }}");
+
+            worker.addEventListener('message', function(e) {
+                var dados = e.data;
+                if (dados.funcao === "add_products") {
+                    var tbodyy = document.querySelector("tbody");
+                    var tr = document.createElement("tr");
+                    tr.id = dados.id;
+                    tr.innerHTML = dados.innerhtml;
+                    tbodyy.appendChild(tr);
+                }
+            });
+
             tmpSelect.id = "categ-atual";
+
         }
 
         if (optSelect.value === "selecione") {
-            //divPrincipal.innerHTML = ``;
+            divPrincipal.innerHTML = ``;
         } else if (optSelect.value === "mais-vendidos") {
             var categId = "";
             if (document.getElementById("categ-atual")) {
-                var categAtual = document.getElementById("categ-atual");
-
-                categId = categAtual.value;
-
-                categAtual.id = "categ-"+categId;
-
+                if (document.getElementById("categ-atual").value !== "selecione") {
+                    var categAtual = document.getElementById("categ-atual");
+    
+                    categId = categAtual.value;
+    
+                    categAtual.id = "categ-"+categId;
+                } else {
+                    categId = "selecione";
+                }
             }
 
             if (categId.includes("pare-aqui-")) {
 
                 load_products(categId.split("-")[2]);
 
-            } else {
+            } else if (categId !== "selecione") {
                 var loading = document.createElement("div");
                 loading.className = "spinner-border text-primary";
                 loading.setAttribute("role", "status");
                 loading.innerHTML = `<span class="visually-hidden">Loading...</span>`;
                 divPrincipal.appendChild(loading);
 
-                var select = document.createElement("select");
-                select.id = "categ-atual";
-                select.className = "form-select select-categ";
-                select.setAttribute("aria-label", "Selecione a categoria");
-                select.setAttribute("onchange", "onChangeSelect(this.id)");
-                select.setAttribute("hier", hier.length+1);
-
-                var option = document.createElement("option");
-                option.value = "selecione";
-                option.textContent = "Selecione";
-                option.selected = true;
-                select.appendChild(option);
-
-                if (categId !== "") {
-                    var option = document.createElement("option");
-                    option.value = "pare-aqui-"+categId;
-                    option.textContent = "Pare aqui";
-                    select.appendChild(option);
-                }
-
+                
                 var xhr = new XMLHttpRequest();
                 if (categId === "") {
                     xhr.open("GET", "{{ base_url }}/api/v1/meli/categoria/todas", true);
@@ -91,20 +154,40 @@
                 xhr.setRequestHeader("x-access-token", getCookie("token"));
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText).result;
                         // Manipulate response data here
                         if (categId === "") {
+                            var response = JSON.parse(xhr.responseText).result;
                             var filhos = response;
                         } else {
+                            var response = JSON.parse(xhr.responseText).result[0].json;
                             var filhos = response.children_categories;
                         }
                         //var filhos = response.children_categories;
-
+                        
                         if (filhos.length === 0) {
                             loading.remove();
                             load_products(categId);
                         } else {
-
+                            var select = document.createElement("select");
+                            select.id = "categ-atual";
+                            select.className = "form-select select-categ";
+                            select.setAttribute("aria-label", "Selecione a categoria");
+                            select.setAttribute("onchange", "onChangeSelect(this.id)");
+                            select.setAttribute("hier", hier.length+1);
+            
+                            var option = document.createElement("option");
+                            option.value = "selecione";
+                            option.textContent = "Selecione";
+                            option.selected = true;
+                            select.appendChild(option);
+            
+                            if (categId !== "") {
+                                var option = document.createElement("option");
+                                option.value = "pare-aqui-"+categId;
+                                option.textContent = "Pare aqui";
+                                select.appendChild(option);
+                            }
+                            
                             for (var filho in filhos) {
                                 var filho = filhos[filho];
                                 var option = document.createElement("option");
@@ -130,35 +213,71 @@
         }
     }
 
-    async function add_product(tbody, produto) {
-        //var tr = document.createElement("tr");
+    function add_products() {
+        var tbody = document.querySelector("tbody");
 
-        var tbodyy = document.querySelector("tbody");
+        var all_trs = tbody.querySelectorAll("tr");
 
-        //"%Y-%m-%dT%H:%M:%S.%fZ"
-        var data_criacao = new Date(produto.date_created);
-        var data_atual = new Date();
-        var tempo_vida = Math.round((data_atual - data_criacao) / (1000 * 60 * 60 * 24))
-        var visitas_totais = 0;
-        for (var i = 0; i < produto.visitas.length; i++) {
-            visitas_totais += produto.visitas[i];
+        var produtos = []
+        var categorias = []
+        var range_vendas = []
+        var tempo_vida = []
+        var m_visitas_diarias = []
+        var preco_venda = []
+        var tipo_anuncio = []
+        var taxa_fixa = []
+        var comissao = []
+        var titulo = []
+        var link = []
+        var frete_gratis = []
+        var custo_frete = []
+        for (var i = 0; i < all_trs.length; i++) {
+            var adc_product = all_trs[i].querySelector("#"+all_trs[i].id+"-adicionar");
+            if (adc_product.querySelector("input").checked) {
+                var infos = all_trs[i].querySelector("#infos");
+                produtos.push(all_trs[i].id);
+                categorias.push(infos.attributes.getNamedItem("categoria").value);
+                range_vendas.push(all_trs[i].querySelector("#"+all_trs[i].id+"-range_vendas").textContent);
+                tempo_vida.push(all_trs[i].querySelector("#"+all_trs[i].id+"-tempo_vida").textContent);
+                m_visitas_diarias.push(all_trs[i].querySelector("#"+all_trs[i].id+"-visitas_dia").textContent);
+                preco_venda.push(all_trs[i].querySelector("#"+all_trs[i].id+"-preco").textContent);
+                tipo_anuncio.push(infos.attributes.getNamedItem("tipo_anuncio").value);
+                taxa_fixa.push(infos.attributes.getNamedItem("taxa_fixa").value);
+                comissao.push(infos.attributes.getNamedItem("comissao").value);
+                titulo.push(all_trs[i].querySelector("#"+all_trs[i].id+"-titulo").textContent);
+                link.push(all_trs[i].querySelector("#"+all_trs[i].id+"-link").querySelector("a").href);
+                frete_gratis.push(infos.attributes.getNamedItem("frete_gratis").value);
+                custo_frete.push(infos.attributes.getNamedItem("custo_frete").value);
+            }
         }
-        var media_visitas = (visitas_totais / produto.visitas.length).toFixed();
-        tbodyy.innerHTML += `
-        <tr>
-            <td><a href="${produto.permalink}" target="_blank">Ver</a></td>
-            <td><img src="${produto.pictures[0].secure_url}" alt="Imagem do produto" width="70" height="70"></td>
-            <td>${produto.title}</td>
-            <td>${produto.price}</td>
-            <td>${tempo_vida} dias</td>
-            <td>${produto.range_vendas}</td>
-            <td>${((produto.range_vendas/tempo_vida)*30).toFixed()}</td>
-            <td>${media_visitas}</td>
-            <td><button type="button" class="btn btn-primary" onclick="addProduct(${produto.id})">Adicionar</button></td>
-        </tr>
-        `;
+        data = {
+            "produtos": produtos,
+            "categorias": categorias,
+            "range_vendas": range_vendas,
+            "tempo_vida": tempo_vida,
+            "m_visitas_diarias": m_visitas_diarias,
+            "preco_venda": preco_venda,
+            "tipo_anuncio": tipo_anuncio,
+            "taxa_fixa": taxa_fixa,
+            "comissao": comissao,
+            "titulo": titulo,
+            "link": link,
+            "frete_gratis": frete_gratis,
+            "custo_frete": custo_frete
+        }
 
-        //tbodyy.innerHTML += tr.outerHTML;
+        var xhrap = new XMLHttpRequest();
+        xhrap.open("POST", "{{ base_url }}/api/v1/pesquisa_mercado/anuncios?pesquisa={{ id_pesquisa }}", true);
+        xhrap.setRequestHeader("Content-Type", "application/json");
+        xhrap.setRequestHeader("x-access-token", getCookie("token"));
+        xhrap.onreadystatechange = function() {
+            if (xhrap.readyState === 4 && xhrap.status === 200) {
+                var response = JSON.parse(xhrap.responseText).result;
+                // Manipulate response data here
+                console.log(response);
+            }
+        };
+        xhrap.send(JSON.stringify(data));
     }
 
     function load_products(valor) {
@@ -193,6 +312,14 @@
         
         divPrincipal.appendChild(table);
 
+        var button = document.createElement("button");
+        button.className = "btn btn-primary";
+        button.type = "button";
+        button.textContent = "Adicionar todos";
+        button.setAttribute("onclick", "add_products()");
+
+        divPrincipal.appendChild(button);
+
         tbody = table.querySelector("tbody");
 
         var xhr = new XMLHttpRequest();
@@ -204,28 +331,18 @@
                 // Manipulate response data here
                 var produtos = response.content;
 
-                for (var produto in produtos) {
-                    var xhrp = new XMLHttpRequest();
-                    xhrp.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+produtos[produto].id+"?range_vendas=true&visitas=30", false);
-                    xhrp.setRequestHeader("x-access-token", getCookie("token"));
-                    xhrp.onreadystatechange = function() {
-                        if (xhrp.readyState === 4 && xhrp.status === 200) {
-                            var response = JSON.parse(xhrp.responseText).result;
-                            // Manipulate response data here
-                            var produto = response;
 
-                            add_product(tbody, produto);
+                //add_products(produtos);
+                worker.postMessage({ funcao:"add_products", valor:[produtos, getCookie("token"), "{{ base_url }}"] }); // assíncrono - retorna imediatamente
 
-                        }
-                    };
-                    xhrp.send();
-                }
 
                 loading.remove();
             }
         };
         xhr.send();
     }
+
+
 </script>
 
 {% endblock %}
