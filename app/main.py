@@ -106,6 +106,12 @@ def anuncios():
     pagina = "anuncios"
     return render_template("principais/anuncios.html", base_url=base_url, pagina=pagina)
 
+@app.route("/anuncios/pesquisar")
+@token_required
+def anuncios_pesquisar():
+    pagina = "anuncios"
+    return render_template("principais/anuncios_pesquisar.html", base_url=base_url, pagina=pagina)
+
 @app.route("/analise_mercado")
 @token_required
 def analise_mercado():

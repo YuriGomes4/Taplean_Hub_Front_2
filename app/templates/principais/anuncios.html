@@ -1,1 +1,126 @@
 {% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.1/css/dataTables.dataTables.css"/>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Anúncios seguidos</h1>
+
+<div id="lista_anuncios">
+    <div class="d-flex justify-content-center loading">
+        <div class="spinner-border m-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<div class="d-grid gap-2">
+    <button class="btn btn-primary" onclick="window.location.href='/anuncios/pesquisar'">Pesquisar um anúncio</button>
+</div>
+
+<script>
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "{{ base_url }}/api/v1/anuncio", true);
+    xhr.setRequestHeader("x-access-token", getCookie("token"));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText).result;
+            // Manipulate response data here
+            listaAnuncios = document.getElementById("lista_anuncios");
+
+            var table = document.createElement("table");
+            table.className = "table table-hover";
+            table.style.width = "100%";
+            table.id = "table-" + Math.floor(Math.random() * 9000 + 1000);
+
+            var tableHead = table.createTHead();
+            var row = document.createElement("tr");
+            var thMlb = document.createElement("th");
+            var thTitulo = document.createElement("th");
+            var thStatus = document.createElement("th");
+            var thPosicao = document.createElement("th");
+            var thPreco = document.createElement("th");
+            var thAcao = document.createElement("th");
+
+            thMlb.textContent = "MLB";
+            thTitulo.textContent = "Título";
+            thStatus.textContent = "Status";
+            thPosicao.textContent = "Posição";
+            thPreco.textContent = "Preço";
+            thAcao.textContent = "";
+
+            row.appendChild(thMlb);
+            row.appendChild(thTitulo);
+            row.appendChild(thStatus);
+            row.appendChild(thPosicao);
+            row.appendChild(thPreco);
+            row.appendChild(thAcao);
+
+            tableHead.appendChild(row);
+
+            table.appendChild(tableHead);
+
+            var tableBody = table.createTBody();
+
+            for (var anuncio in response) {
+                var row = document.createElement("tr");
+                var tdMlb = document.createElement("td");
+                var tdTitulo = document.createElement("td");
+                var tdStatus = document.createElement("td");
+                var tdPosicao = document.createElement("td");
+                var tdPreco = document.createElement("td");
+                var tdAcao = document.createElement("td");
+
+                var statusDict = {
+                    "active": "Ativo",
+                    "paused": "Pausado",
+                    "under_review": "Em revisão"
+                };
+
+                tdMlb.textContent = response[anuncio].id.split('$')[1];
+                tdTitulo.textContent = response[anuncio].titulo;
+                tdStatus.textContent = statusDict[response[anuncio].status];
+                tdPosicao.textContent = response[anuncio].posicao;
+                tdPreco.textContent = response[anuncio].preco;
+
+                var btn = document.createElement("button");
+                btn.className = "btn btn-primary";
+                btn.textContent = "Ver detalhes";
+                btn.onclick = function() {
+                    window.location.href = "/anuncios/" + response[anuncio].id;
+                };
+
+                tdAcao.appendChild(btn);
+
+                row.appendChild(tdMlb);
+                row.appendChild(tdTitulo);
+                row.appendChild(tdStatus);
+                row.appendChild(tdPosicao);
+                row.appendChild(tdPreco);
+                row.appendChild(tdAcao);
+
+                tableBody.appendChild(row);
+            }
+
+            table.appendChild(tableBody);
+
+            listaAnuncios.appendChild(table);
+
+            // apagar todos os elementos de loading
+
+            var loading = document.querySelectorAll(".loading");
+            for (var i = 0; i < loading.length; i++) {
+                loading[i].remove();
+            }
+
+            new DataTable('#' + table.id);
+        }
+    };
+    xhr.send();
+</script>
+
+{% endblock %}

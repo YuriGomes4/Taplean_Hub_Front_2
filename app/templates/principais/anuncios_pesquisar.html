@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Pesquisar anúncios</h1>
+
+<div id="pesquisa" class="input-group mb-3">
+    <input id="input_link" type="text" class="form-control" placeholder="Link do produto" aria-label="Pesquise pelo produto" aria-describedby="button-search" value="https://www.mercadolivre.com.br/micro-ondas-mi41s-31-litros-prata-31l-electrolux-127v/p/MLB18363110?pdp_filters=item_id%3AMLB2036335692&attributes=COLOR%3APrata%2CVOLTAGE%3A127V">
+    <input id="input_termo" type="text" class="form-control" placeholder="Como você procuraria o produto no Mercado Livre" aria-label="Pesquise pelo produto" aria-describedby="button-search" value="microondas prata">
+    <button class="btn btn-outline-secondary" type="button" id="button-search" onclick="load_produto()">Pesquisar</button>
+</div>
+
+
+<div id="div-principal">
+    <div class="accordion" id="accordionPanelsStayOpen">
+        <!--<div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+              Accordion Item #1
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+              <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+              Accordion Item #2
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+              Accordion Item #3
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+            </div>
+          </div>
+        </div>-->
+    </div>
+</div>
+
+<script>
+    function load_produto() {
+        var link = document.getElementById("input_link").value;
+        var termo = document.getElementById("input_termo").value;
+
+        var divPrincipal = document.getElementById("accordionPanelsStayOpen");
+        
+        divPrincipal.innerHTML = "";
+
+        var loading = document.createElement("div");
+        loading.className = "d-flex justify-content-center loading";
+        loading.innerHTML = '<div class="spinner-border m-5" role="status"><span class="visually-hidden">Loading...</span></div>';
+        divPrincipal.appendChild(loading);
+
+        logistica = {
+            "xd_drop_off": "Mercado Envios Agência",
+            "cross_docking": "Mercado Envios Coleta",
+            "self_service": "Mercado Envios Flex",
+            "fulfillment": "Mercado Envios Fulfillment",
+            "drop_off": "Mercado Envios Agência",
+        };
+
+        var statusDict = {
+            "active": "Ativo",
+            "paused": "Pausado",
+            "under_review": "Em revisão"
+        };
+
+        var dict_bool = {
+            "true": "Sim",
+            "false": "Não",
+        };
+
+        var dict_listing = {
+            'gold_pro': 'Premium',
+            'gold_premium': 'Diamante',
+            'gold_special': 'Clássico',
+            'gold': 'Ouro',
+            'silver': 'Prata',
+            'bronze': 'Bronze',
+            'free': 'Gratuíto',
+        };
+
+        var xhrl = new XMLHttpRequest();
+        xhrl.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pegarmlb?link="+link, true);
+        xhrl.setRequestHeader("x-access-token", getCookie("token"));
+        xhrl.onreadystatechange = function() {
+            if (xhrl.readyState === 4 && xhrl.status === 200) {
+                var response = JSON.parse(xhrl.responseText).result;
+                // Manipulate response data here
+                var mlb = response;
+
+                var xhra = new XMLHttpRequest();
+                xhra.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+mlb+"?range_vendas=True&categoria=True&termo="+termo, true);
+                xhra.setRequestHeader("x-access-token", getCookie("token"));
+                xhra.onreadystatechange = function() {
+                    if (xhra.readyState === 4 && xhra.status === 200) {
+                        var response = JSON.parse(xhra.responseText).result;
+                        // Manipulate response data here
+                        var anuncio = response;
+
+                        /*var cardSobre = document.createElement("div");
+                        cardSobre.className = "card";
+                        cardSobre.id = "card-sobre";
+
+                        var cardHeader = document.createElement("div");
+                        cardHeader.className = "card-header text-center";
+                        cardHeader.innerHTML = "<h5><strong>Sobre o produto</strong></h5>";
+
+                        var cardBody = document.createElement("div");
+                        cardBody.className = "card-body";
+                        cardBody.id = "card-sobre-body";*/
+
+                        var acordSobre = document.createElement("div");
+                        acordSobre.className = "accordion-item";
+                        var h2Sobre = document.createElement("h2");
+                        h2Sobre.className = "accordion-header";
+                        var buttonSobre = document.createElement("button");
+                        buttonSobre.className = "accordion-button collapsed";
+                        buttonSobre.type = "button";
+                        buttonSobre.setAttribute("data-bs-toggle", "collapse");
+                        buttonSobre.setAttribute("data-bs-target", "#panelsStayOpen-collapseOne");
+                        buttonSobre.setAttribute("aria-expanded", "false");
+                        buttonSobre.setAttribute("aria-controls", "panelsStayOpen-collapseOne");
+                        buttonSobre.textContent = "Sobre o produto";
+                        h2Sobre.appendChild(buttonSobre);
+                        acordSobre.appendChild(h2Sobre);
+                        var divBodySobre = document.createElement("div");
+                        divBodySobre.id = "panelsStayOpen-collapseOne";
+                        divBodySobre.className = "accordion-collapse collapse";
+                        var bodySobre = document.createElement("div");
+                        bodySobre.className = "accordion-body";
+                        
+
+                        /*MLB: MLB2036335692
+
+                        Título: Micro-ondas Mi41s 31 Litros Prata 31l Electrolux 127v
+
+                        Posição do anúncio: 14º em "microondas prata"
+
+                        Preço: R$ 961,15
+
+                        Desconto: 13%
+
+                        Status: Ativo
+
+                        Tipo do anúncio: Premium
+
+                        Entrega grátis: Sim
+
+                        Logística: Mercado Envios Fulfillment
+
+                        Saúde do anúncio: 100%
+
+                        Categoria: Eletrodomésticos > Fornos e Fogões > Microondas
+
+                        Catálogo: Sim*/
+
+                        var pMlb = document.createElement("p");
+                        pMlb.className = "card-text";
+                        pMlb.textContent = "MLB: "+anuncio.id;
+
+                        var pTitulo = document.createElement("p");
+                        pTitulo.className = "card-text";
+                        pTitulo.textContent = "Título: "+anuncio.title;
+
+                        var pPosicao = document.createElement("p");
+                        pPosicao.className = "card-text";
+                        pPosicao.textContent = 'Posição do anúncio: '+anuncio.posicao+'º em "'+termo+'"';
+                        //pPosicao.textContent = "Posição do anúncio: "+anuncio.position+"º em \""+termo+"\"";
+
+                        var pPreco = document.createElement("p");
+                        pPreco.className = "card-text";
+                        pPreco.textContent = "Preço: R$ "+anuncio.price;
+
+                        var pDesconto = document.createElement("p");
+                        pDesconto.className = "card-text";
+                        if (anuncio.original_price) {
+                            var desconto = parseFloat(anuncio.original_price) - parseFloat(anuncio.price);
+                            pDesconto.textContent = "Desconto: "+((desconto/anuncio.original_price)*100).toFixed()+"%";
+                        } else {
+                            var desconto = parseFloat(anuncio.price)+1;
+                            pDesconto.textContent = "Desconto: 0%";
+                        }
+
+                        var pStatus = document.createElement("p");
+                        pStatus.className = "card-text";
+                        pStatus.textContent = "Status: "+statusDict[anuncio.status];
+
+                        var pTipo = document.createElement("p");
+                        pTipo.className = "card-text";
+                        pTipo.textContent = "Tipo do anúncio: "+dict_listing[anuncio.listing_type_id];
+
+                        var pEntrega = document.createElement("p");
+                        pEntrega.className = "card-text";
+                        pEntrega.textContent = "Entrega grátis: "+dict_bool[anuncio.shipping.free_shipping];
+
+                        var pLogistica = document.createElement("p");
+                        pLogistica.className = "card-text";
+                        pLogistica.textContent = "Logística: "+logistica[anuncio.shipping.logistic_type];
+
+                        var pSaude = document.createElement("p");
+                        pSaude.className = "card-text";
+                        pSaude.textContent = "Saúde do anúncio: "+(anuncio.health*100)+"%";
+
+                        var pCategoria = document.createElement("p");
+                        pCategoria.className = "card-text";
+                        pCategoria.textContent = "Categoria: "+anuncio.category.cat_path+" ("+ anuncio.category_id +")";
+
+                        var pCatalogo = document.createElement("p");
+                        pCatalogo.className = "card-text";
+                        pCatalogo.textContent = "Catálogo: "+dict_bool[anuncio.catalog_listing];
+
+                        /*cardBody.appendChild(pMlb);
+                        cardBody.appendChild(pTitulo);
+                        cardBody.appendChild(pPosicao);
+                        cardBody.appendChild(pPreco);
+                        cardBody.appendChild(pDesconto);
+                        cardBody.appendChild(pStatus);
+                        cardBody.appendChild(pTipo);
+                        cardBody.appendChild(pEntrega);
+                        cardBody.appendChild(pLogistica);
+                        cardBody.appendChild(pSaude);
+                        cardBody.appendChild(pCategoria);
+                        cardBody.appendChild(pCatalogo);
+
+                        cardSobre.appendChild(cardHeader);
+                        cardSobre.appendChild(cardBody);*/
+
+                        bodySobre.appendChild(pMlb);
+                        bodySobre.appendChild(pTitulo);
+                        bodySobre.appendChild(pPosicao);
+                        bodySobre.appendChild(pPreco);
+                        bodySobre.appendChild(pDesconto);
+                        bodySobre.appendChild(pStatus);
+                        bodySobre.appendChild(pTipo);
+                        bodySobre.appendChild(pEntrega);
+                        bodySobre.appendChild(pLogistica);
+                        bodySobre.appendChild(pSaude);
+                        bodySobre.appendChild(pCategoria);
+                        bodySobre.appendChild(pCatalogo);
+                        
+                        divBodySobre.appendChild(bodySobre);
+                        acordSobre.appendChild(divBodySobre);
+
+
+
+                        /*var cardVendas = document.createElement("div");
+                        cardVendas.className = "card";
+                        cardVendas.id = "card-vendas";
+
+                        var cardHeader = document.createElement("div");
+                        cardHeader.className = "card-header text-center";
+                        cardHeader.innerHTML = "<h5><strong>Vendas</strong></h5>";
+
+                        var cardBody = document.createElement("div");
+                        cardBody.className = "card-body";
+                        cardBody.id = "card-vendas-body";*/
+
+                        var acordVendas = document.createElement("div");
+                        acordVendas.className = "accordion-item";
+                        var h2Vendas = document.createElement("h2");
+                        h2Vendas.className = "accordion-header";
+                        var buttonVendas = document.createElement("button");
+                        buttonVendas.className = "accordion-button collapsed";
+                        buttonVendas.type = "button";
+                        buttonVendas.setAttribute("data-bs-toggle", "collapse");
+                        buttonVendas.setAttribute("data-bs-target", "#panelsStayOpen-collapseTwo");
+                        buttonVendas.setAttribute("aria-expanded", "false");
+                        buttonVendas.setAttribute("aria-controls", "panelsStayOpen-collapseTwo");
+                        buttonVendas.textContent = "Vendas";
+                        h2Vendas.appendChild(buttonVendas);
+                        acordVendas.appendChild(h2Vendas);
+                        var divBodyVendas = document.createElement("div");
+                        divBodyVendas.id = "panelsStayOpen-collapseTwo";
+                        divBodyVendas.className = "accordion-collapse collapse";
+                        var bodyVendas = document.createElement("div");
+                        bodyVendas.className = "accordion-body";
+
+
+                        var pRange = document.createElement("p");
+                        pRange.className = "card-text";
+                        pRange.textContent = "Range de vendas: "+anuncio.range_vendas;
+
+                        var pDataCriacao = document.createElement("p");
+                        pDataCriacao.className = "card-text";
+                        var dataCriacao = new Date(anuncio.date_created);
+                        var dia = String(dataCriacao.getDate()).padStart(2, '0');
+                        var mes = String(dataCriacao.getMonth() + 1).padStart(2, '0');
+                        var ano = dataCriacao.getFullYear();
+                        pDataCriacao.textContent = "Data de criação: " + dia + "/" + mes + "/" + ano;
+
+                        var pTempoVida = document.createElement("p");
+                        pTempoVida.className = "card-text";
+                        var dataAtual = new Date();
+                        var tempoVida = Math.floor((dataAtual - dataCriacao) / (1000 * 60 * 60 * 24));
+                        pTempoVida.textContent = "Tempo de vida: " + tempoVida + " dias";
+
+                        var pVendasDia = document.createElement("p");
+                        pVendasDia.className = "card-text";
+                        pVendasDia.textContent = "Média de vendas por dia: "+(parseInt(anuncio.range_vendas)/tempoVida).toFixed(2)+" vendas";
+
+                        
+                        var pVendasMes = document.createElement("p");
+                        pVendasMes.className = "card-text";
+                        if (parseInt(anuncio.range_vendas) > 0) {
+                            var vendasMes = parseInt(anuncio.range_vendas/tempoVida).toFixed(2) * 30;
+                        } else {
+                            var vendasMes = "Indisponível";
+                        }
+                        pVendasMes.textContent = "Média de vendas por mês: "+vendasMes;
+
+                        var grafico = ""
+                        var pTotalVisitas = document.createElement("p");
+                        pTotalVisitas.className = "card-text";
+                        var pTaxaConversao = document.createElement("p");
+                        pTaxaConversao.className = "card-text";
+
+                        var ontem = new Date();
+                        ontem.setDate(ontem.getDate() - 1);
+                        var dia = String(ontem.getDate()).padStart(2, '0');
+                        var mes = String(ontem.getMonth() + 1).padStart(2, '0');
+                        var ano = ontem.getFullYear();
+                        var dataFormatada = ano + "-" + mes + "-" + dia;
+
+                        var xhrvs = new XMLHttpRequest();
+                        xhrvs.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+mlb+"/grafico?tipo=visitas", true);
+                        xhrvs.setRequestHeader("x-access-token", getCookie("token"));
+                        xhrvs.onreadystatechange = function() {
+                            if (xhrvs.readyState === 4) {
+                                if (xhrvs.status === 200) {
+                                    var response = JSON.parse(xhrvs.responseText).result;
+                                    // Manipulate response data here
+                                    grafico = response.grafico;
+
+                                    pTotalVisitas.textContent = "Total de visitas: "+response.total_visitas;
+                                    if (parseInt(response.total_visitas) > 0) {
+                                        pTaxaConversao.textContent = "Taxa de conversão média: "+((parseInt(anuncio.range_vendas)/parseInt(response.total_visitas))*100).toFixed(2)+"%";
+                                    } else {
+                                        pTaxaConversao.textContent = "Taxa de conversão média: Indisponível";
+                                    }
+                                } else {
+                                    pTotalVisitas.textContent = "Total de visitas: Indisponível";
+                                    pTaxaConversao.textContent = "Taxa de conversão média: Indisponível";
+                                }
+                            }
+                        };
+                        xhrvs.send();
+                        
+                        bodyVendas.appendChild(pRange);
+                        bodyVendas.appendChild(pDataCriacao);
+                        bodyVendas.appendChild(pTempoVida);
+                        bodyVendas.appendChild(pVendasDia);
+                        bodyVendas.appendChild(pVendasMes);
+                        bodyVendas.appendChild(pTotalVisitas);
+                        bodyVendas.appendChild(pTaxaConversao);
+
+                        //cardVendas.appendChild(cardHeader);
+                        //cardVendas.appendChild(cardBody);
+                        divBodyVendas.appendChild(bodyVendas);
+                        acordVendas.appendChild(divBodyVendas);
+
+
+
+                        var acordValores = document.createElement("div");
+                        acordValores.className = "accordion-item";
+                        var h2Valores = document.createElement("h2");
+                        h2Valores.className = "accordion-header";
+                        var buttonValores = document.createElement("button");
+                        buttonValores.className = "accordion-button collapsed";
+                        buttonValores.type = "button";
+                        buttonValores.setAttribute("data-bs-toggle", "collapse");
+                        buttonValores.setAttribute("data-bs-target", "#panelsStayOpen-collapseThree");
+                        buttonValores.setAttribute("aria-expanded", "false");
+                        buttonValores.setAttribute("aria-controls", "panelsStayOpen-collapseThree");
+                        buttonValores.textContent = "Valores";
+                        h2Valores.appendChild(buttonValores);
+                        acordValores.appendChild(h2Valores);
+                        var divBodyValores = document.createElement("div");
+                        divBodyValores.id = "panelsStayOpen-collapseThree";
+                        divBodyValores.className = "accordion-collapse collapse";
+                        var bodyValores = document.createElement("div");
+                        bodyValores.className = "accordion-body";
+                        
+                        
+                        var pTaxaVenda = document.createElement("p");
+                        pTaxaVenda.className = "card-text";
+                        pTaxaVenda.textContent = "Taxa de venda: R$ "+anuncio.sale_fee;
+
+                        var pCustoEntregaGratis = document.createElement("p");
+                        pCustoEntregaGratis.className = "card-text";
+                        pCustoEntregaGratis.textContent = "Custo de entrega grátis: R$ "+anuncio.shipping_free_cost;
+
+                        var liquido = parseFloat(anuncio.price) - parseFloat(anuncio.shipping_free_cost) - parseFloat(anuncio.sale_fee);
+                        
+                        var pRecebimentoBruto = document.createElement("p");
+                        pRecebimentoBruto.className = "card-text";
+                        pRecebimentoBruto.textContent = "Recebimento bruto: R$ "+liquido.toFixed(2);
+
+                        var pFaturamentoTotal = document.createElement("p");
+                        pFaturamentoTotal.className = "card-text";
+                        pFaturamentoTotal.textContent = "Faturamento total: R$ "+(parseInt(anuncio.range_vendas)*parseFloat(anuncio.price)).toFixed(2);
+
+                        var pFaturamentoBrutoTotal = document.createElement("p");
+                        pFaturamentoBrutoTotal.className = "card-text";
+                        pFaturamentoBrutoTotal.textContent = "Faturamento bruto total: R$ "+(parseInt(anuncio.range_vendas)*liquido).toFixed(2);
+
+                        bodyValores.appendChild(pTaxaVenda);
+                        bodyValores.appendChild(pCustoEntregaGratis);
+                        bodyValores.appendChild(pRecebimentoBruto);
+                        bodyValores.appendChild(pFaturamentoTotal);
+                        bodyValores.appendChild(pFaturamentoBrutoTotal);
+
+                        divBodyValores.appendChild(bodyValores);
+                        acordValores.appendChild(divBodyValores);
+
+                        loading.remove();
+
+                        divPrincipal.appendChild(acordSobre);
+                        //divPrincipal.appendChild(document.createElement("br"));
+                        divPrincipal.appendChild(acordVendas);
+                        //divPrincipal.appendChild(document.createElement("br"));
+                        divPrincipal.appendChild(acordValores);
+
+                    }
+                };
+                xhra.send();
+            }
+        };
+        xhrl.send();
+    }
+</script>
+
+{% endblock %}
