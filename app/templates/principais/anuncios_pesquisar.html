@@ -18,6 +18,7 @@
 
 
 <div id="div-principal">
+    <div id="div-header" style="display: flex; align-items: center; flex-direction: column;"></div>
     <div class="accordion" id="accordionPanelsStayOpen">
         <!--<div class="accordion-item">
           <h2 class="accordion-header">
@@ -57,6 +58,7 @@
         </div>-->
     </div>
 </div>
+<div id="div-grafico"></div>
 
 <script>
     function load_produto() {
@@ -64,8 +66,12 @@
         var termo = document.getElementById("input_termo").value;
 
         var divPrincipal = document.getElementById("accordionPanelsStayOpen");
+        var divGrafico = document.getElementById("div-grafico");
+        var divHeader = document.getElementById("div-header");
         
         divPrincipal.innerHTML = "";
+        divGrafico.innerHTML = "";
+        divHeader.innerHTML = "";
 
         var loading = document.createElement("div");
         loading.className = "d-flex justify-content-center loading";
@@ -132,6 +138,19 @@
                         var cardBody = document.createElement("div");
                         cardBody.className = "card-body";
                         cardBody.id = "card-sobre-body";*/
+
+                        var h2Titulo = document.createElement("h2");
+                        h2Titulo.innerText = anuncio.title;
+
+                        var imagem = document.createElement("img");
+                        imagem.src = anuncio.pictures[0].secure_url;
+                        imagem.className = "img-fluid";
+                        imagem.alt = anuncio.title;
+
+                        divHeader.appendChild(h2Titulo);
+                        divHeader.appendChild(imagem);
+
+
 
                         var acordSobre = document.createElement("div");
                         acordSobre.className = "accordion-item";
@@ -302,7 +321,7 @@
 
                         var pRange = document.createElement("p");
                         pRange.className = "card-text";
-                        pRange.textContent = "Range de vendas: "+anuncio.range_vendas;
+                        pRange.textContent = "Range de vendas: +"+anuncio.range_vendas;
 
                         var pDataCriacao = document.createElement("p");
                         pDataCriacao.className = "card-text";
@@ -332,7 +351,7 @@
                         }
                         pVendasMes.textContent = "Média de vendas por mês: "+vendasMes;
 
-                        var grafico = ""
+                        //var grafico = ""
                         var pTotalVisitas = document.createElement("p");
                         pTotalVisitas.className = "card-text";
                         var pTaxaConversao = document.createElement("p");
@@ -353,7 +372,9 @@
                                 if (xhrvs.status === 200) {
                                     var response = JSON.parse(xhrvs.responseText).result;
                                     // Manipulate response data here
-                                    grafico = response.grafico;
+                                    //var grafico = response.grafico;
+                                    divGrafico.innerHTML = response.grafico;
+                                    rodarScripts(divGrafico);
 
                                     pTotalVisitas.textContent = "Total de visitas: "+response.total_visitas;
                                     if (parseInt(response.total_visitas) > 0) {
@@ -436,6 +457,117 @@
                         divBodyValores.appendChild(bodyValores);
                         acordValores.appendChild(divBodyValores);
 
+
+
+                        var acordVendedor = document.createElement("div");
+                        acordVendedor.className = "accordion-item";
+                        var h2Vendedor = document.createElement("h2");
+                        h2Vendedor.className = "accordion-header";
+                        var buttonVendedor = document.createElement("button");
+                        buttonVendedor.className = "accordion-button collapsed";
+                        buttonVendedor.type = "button";
+                        buttonVendedor.setAttribute("data-bs-toggle", "collapse");
+                        buttonVendedor.setAttribute("data-bs-target", "#panelsStayOpen-collapseFour");
+                        buttonVendedor.setAttribute("aria-expanded", "false");
+                        buttonVendedor.setAttribute("aria-controls", "panelsStayOpen-collapseFour");
+                        buttonVendedor.textContent = "Vendedor";
+                        h2Vendedor.appendChild(buttonVendedor);
+                        acordVendedor.appendChild(h2Vendedor);
+                        var divBodyVendedor = document.createElement("div");
+                        divBodyVendedor.id = "panelsStayOpen-collapseFour";
+                        divBodyVendedor.className = "accordion-collapse collapse";
+                        var bodyVendedor = document.createElement("div");
+                        bodyVendedor.className = "accordion-body";
+
+                        var pVendedor = document.createElement("p");
+                        pVendedor.className = "card-text";
+                        pVendedor.textContent = "Seller ID: "+anuncio.seller_id;
+
+                        var pVendNome = document.createElement("p");
+                        pVendNome.className = "card-text";
+                        var pReputacao = document.createElement("p");
+                        pReputacao.className = "card-text";
+                        var pNivel = document.createElement("p");
+                        pNivel.className = "card-text";
+                        var pVendCidade = document.createElement("p");
+                        pVendCidade.className = "card-text";
+                        var pVendEstado = document.createElement("p");
+                        pVendEstado.className = "card-text";
+
+                        //crie um dicionario com a UF do estado e o nome
+                        var estados = {
+                            "AC": "Acre",
+                            "AL": "Alagoas",
+                            "AP": "Amapá",
+                            "AM": "Amazonas",
+                            "BA": "Bahia",
+                            "CE": "Ceará",
+                            "DF": "Distrito Federal",
+                            "ES": "Espírito Santo",
+                            "GO": "Goiás",
+                            "MA": "Maranhão",
+                            "MT": "Mato Grosso",
+                            "MS": "Mato Grosso do Sul",
+                            "MG": "Minas Gerais",
+                            "PA": "Pará",
+                            "PB": "Paraíba",
+                            "PR": "Paraná",
+                            "PE": "Pernambuco",
+                            "PI": "Piauí",
+                            "RJ": "Rio de Janeiro",
+                            "RN": "Rio Grande do Norte",
+                            "RS": "Rio Grande do Sul",
+                            "RO": "Rondônia",
+                            "RR": "Roraima",
+                            "SC": "Santa Catarina",
+                            "SP": "São Paulo",
+                            "SE": "Sergipe",
+                            "TO": "Tocantins"
+                        };
+
+                        var xhrven = new XMLHttpRequest();
+                        xhrven.open("GET", "{{ base_url }}/api/v1/meli/vendedor/"+anuncio.seller_id, true);
+                        xhrven.setRequestHeader("x-access-token", getCookie("token"));
+                        xhrven.onreadystatechange = function() {
+                            if (xhrven.readyState === 4) {
+                                if (xhrven.status === 200) {
+                                    var response = JSON.parse(xhrven.responseText).result;
+                                    // Manipulate response data here
+                                    pVendNome.textContent = "Nome do loja: "+response.nickname;
+                                    pReputacao.textContent = "Reputação: "+response.seller_reputation.level_id;
+                                    pNivel.textContent = "Nível: "+response.seller_reputation.power_seller_status;
+                                    pVendCidade.textContent = "Cidade: "+response.address.city;
+                                    pVendEstado.textContent = "Estado: "+estados[response.address.state.replace("BR-", "")];
+                                } else {
+                                    pVendNome.textContent = "Vendedor: Indisponível";
+                                    pReputacao.textContent = "Reputação: Indisponível";
+                                    pNivel.textContent = "Nível: Indisponível";
+                                    pVendCidade.textContent = "Cidade: Indisponível";
+                                    pVendEstado.textContent = "Estado: Indisponível";
+                                }
+                            }
+                        };
+						xhrven.send();
+
+                        var pLojaOficial = document.createElement("p");
+                        pLojaOficial.className = "card-text";
+                        if ('official_store_id' in anuncio) {
+                            pLojaOficial.textContent = "Loja oficial: "+anuncio.official_store_id;
+                        } else {
+                            pLojaOficial.textContent = "Loja oficial: Não";
+                        }
+
+						bodyVendedor.appendChild(pVendedor);
+						bodyVendedor.appendChild(pVendNome);
+						bodyVendedor.appendChild(pReputacao);
+						bodyVendedor.appendChild(pNivel);
+						bodyVendedor.appendChild(pVendCidade);
+						bodyVendedor.appendChild(pVendEstado);
+						bodyVendedor.appendChild(pLojaOficial);
+
+						divBodyVendedor.appendChild(bodyVendedor);
+						acordVendedor.appendChild(divBodyVendedor);
+
                         loading.remove();
 
                         divPrincipal.appendChild(acordSobre);
@@ -443,6 +575,10 @@
                         divPrincipal.appendChild(acordVendas);
                         //divPrincipal.appendChild(document.createElement("br"));
                         divPrincipal.appendChild(acordValores);
+						//divPrincipal.appendChild(document.createElement("br"));
+						divPrincipal.appendChild(acordVendedor);
+                        //divPrincipal.appendChild(document.createElement("br"));
+                        //divPrincipal.appendChild(divGrafico);
 
                     }
                 };
