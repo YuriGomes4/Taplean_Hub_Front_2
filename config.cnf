@@ -1,4 +1,3 @@
 versao: 1.7.0
-orig_url_base: https://tapleanhub.ddnsfree.com
-url_base: http://localhost:5000
-test_url_base: http://10.0.0.71:5000
+url_base: https://tapleanhub.ddnsfree.com
+test_url_base: http://localhost:5000
