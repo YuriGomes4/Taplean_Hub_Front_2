@@ -16,8 +16,10 @@
 
 <!--botao para adiiocnar um vendedor novo-->
 <div class="d-grid gap-2">
-    <button class="btn btn-primary" onclick="window.location.href='conta/novo_vendedor'">Adicionar um novo vendedor</button>
+    <button class="btn btn-primary" onclick="newSeller()">Adicionar um novo vendedor</button>
 </div>
+
+
 
 <script>
     var base_url = "{{ base_url }}";
@@ -83,6 +85,13 @@
         xhr.open("PUT", base_url + "/api/v1/usuario/preferences?dados="+JSON.stringify(prefs).replace(/"/g, "'"), true);
         xhr.setRequestHeader("x-access-token", getCookie("token"));
         xhr.send();
+    }
+
+    function newSeller() {
+        //Precisa abrir um link em uma nova aba
+
+        window.open(base_url + "/conta/novo_vendedor", "_blank");
+        
     }
 </script>
 {% endblock %}
