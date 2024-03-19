@@ -90,7 +90,16 @@
     function newSeller() {
         //Precisa abrir um link em uma nova aba
 
-        window.open(base_url + "/conta/novo_vendedor", "_blank");
+        xhrve = new XMLHttpRequest();
+        xhrve.open("GET", base_url + "/api/v1/vendedor/register", true);
+        xhrve.setRequestHeader("x-access-token", getCookie("token"));
+        xhrve.onreadystatechange = function() {
+            if (xhrve.readyState === 4 && xhrve.status === 200) {
+                var response = JSON.parse(xhrve.responseText).result;
+                window.open(response, "_blank");
+            }
+        };
+        xhrve.send();
         
     }
 </script>
