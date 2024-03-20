@@ -124,7 +124,7 @@
                         statusCell.textContent = statusDict[produto.status];
                         qualidadeCell.textContent = (produto.health*100)+"%";
                         liquidoCell.textContent = "R$ "+(produto.price - produto.shipping_free_cost - produto.sale_fee - produto.cost).toFixed(2).replace(".", ",");
-                        editarCell.innerHTML = '<a class="btn btn-primary" href="/produto/'+produto.id+'" role="button">Editar</a>';
+                        editarCell.innerHTML = '<a class="btn btn-primary" href="/produto/'+produto.id+'" role="button">Ver detalhes</a>';
 
                         row.appendChild(mlbCell);
                         row.appendChild(tituloCell);

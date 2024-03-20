@@ -29,11 +29,12 @@ function add_products(produtos, token, base_url) {
                 var tempo_vida = Math.round((data_atual - data_criacao) / (1000 * 60 * 60 * 24))
                 var visitas_totais = 0;
                 var visitas_dia = [];
-                for (var i = 0; i < produto.visitas.length; i++) {
-                    visitas_totais += produto.visitas[i].total;
-                    visitas_dia.push(produto.visitas[i].total);
+                var visitasProd = produto.visitas.results;
+                for (var i = 0; i < visitasProd.length; i++) {
+                    visitas_totais += visitasProd[i].total;
+                    visitas_dia.push(visitasProd[i].total);
                 }
-                var media_visitas = (visitas_totais / produto.visitas.length).toFixed();
+                var media_visitas = (visitas_totais / visitasProd.length).toFixed();
                 //var variacao_total = 0;
                 var variacao = [];
                 for (var i = 1; i < visitas_dia.length; i++) {

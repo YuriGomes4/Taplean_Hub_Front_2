@@ -142,6 +142,14 @@ def conta():
     pagina = "conta"
     return render_template("principais/conta.html", base_url=base_url, pagina=pagina)
 
+#http://173.249.39.42:5050/conta/novo_vendedor/cb6e401c-f62c-4aef-9562-dc3ed60708a9
+
+@app.route("/conta/novo_vendedor/<string:public_id>")
+@token_required
+def novo_vendedor(public_id):
+    pagina = "conta"
+    return render_template("principais/novo_vendedor.html", base_url=base_url, pagina=pagina, public_id=public_id)
+
 @app.route("/administracao")
 @token_required
 def administracao():

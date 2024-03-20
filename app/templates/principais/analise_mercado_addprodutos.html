@@ -285,7 +285,7 @@
                         var response = JSON.parse(xhrlk.responseText).result;
 
                         if (document.getElementById(response)) {
-                            toast("Produto já adicionado");
+                            toast("Pesquisa", "Produto já adicionado", "Agora");
                         } else {
 
                             var produtos = [{'id': response}];
@@ -297,7 +297,7 @@
                             inpuSearch.value = "";
                         }
                     } else {
-                        toast("Erro ao buscar anúncio");
+                        toast("Pesquisa", "Erro ao buscar anúncio", "Agora");
                     }
 
                 }
@@ -412,13 +412,18 @@
         
         divPrincipal.appendChild(table);
 
+        var divBtn = document.createElement("div");
+        divBtn.className = "d-grid gap-2";
+        
         var button = document.createElement("button");
         button.className = "btn btn-primary addbutton";
         button.type = "button";
         button.textContent = "Adicionar todos";
         button.setAttribute("onclick", "add_products()");
+        
+        divBtn.appendChild(button);
 
-        divPrincipal.appendChild(button);
+        divPrincipal.appendChild(divBtn);
 
         tbody = table.querySelector("tbody");
 
