@@ -371,7 +371,7 @@
             if (xhrap.readyState === 4 && xhrap.status === 200) {
                 var response = JSON.parse(xhrap.responseText).result;
                 // Manipulate response data here
-                console.log(response);
+                toast("Análise de mercado", "Produtos adicionados", "Agora");
             }
         };
         xhrap.send(JSON.stringify(data));
