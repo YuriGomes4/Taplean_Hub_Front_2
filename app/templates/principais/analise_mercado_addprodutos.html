@@ -330,7 +330,7 @@
         var custo_frete = []
         for (var i = 0; i < all_trs.length; i++) {
             var adc_product = all_trs[i].querySelector("#"+all_trs[i].id+"-adicionar");
-            if (adc_product.querySelector("input").checked) {
+            if (adc_product.querySelector("input").checked && !(all_trs[i].querySelector("#"+all_trs[i].id+"-titulo").textContent.includes("catálogo"))) {
                 var infos = all_trs[i].querySelector("#infos");
                 produtos.push(all_trs[i].id);
                 categorias.push(infos.attributes.getNamedItem("categoria").value);
