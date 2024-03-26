@@ -11,6 +11,21 @@
     color: var(--text-color);
 }
 
+.colors {
+    primary        : #ff6565;
+    secondary      : #a17979;
+    success        : #0598a3;
+    info           : #d19f66;
+    warning        : #fbbc06;
+    danger         : #8b33ff;
+    light          : #efe9e9;
+    dark           : #170606;
+    muted          : #a17979;
+    gridBorder     : rgba(240, 77, 77, 0.15);
+    bodyColor      : #d9b8b8;
+    cardBg         : #270c0c;
+  }
+
 .modal-content {
     /* position: relative; */
     /* display: flex; */

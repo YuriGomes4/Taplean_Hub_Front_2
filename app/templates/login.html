@@ -176,6 +176,10 @@
           </label>
         </div>-->
         <button class="btn btn-primary w-100 py-2" type="submit" onclick="login()">Entrar</button>
+
+        <div style="padding-top: 10px; display: flex; justify-content: center;">  
+            <a href="/verificar_email">Não tenho uma conta</a>
+        </div>
         <!--<p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>-->
       </div>
     </main>
@@ -210,6 +214,12 @@
         xhr.send(`email=${email}&password=${password}`);
       }
     </script>
+
+    <div id="aviso-dev" style="height: 3vh; position: fixed; margin-top: 97vh; background-color: yellow; width: 100%; display: flex; justify-content: center; align-items: center;">
+      <div>
+        <strong style="color: black;">Essa plataforma está em fase de desenvolvimento com teste grátis, erros e quedas poderão ocorrer durante seu uso!</strong>
+      </div>
+    </div>
 
     </body>
     </html>

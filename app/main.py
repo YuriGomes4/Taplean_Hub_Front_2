@@ -156,6 +156,24 @@ def administracao():
     pagina = "administracao"
     return render_template("principais/administracao.html", base_url=base_url, pagina=pagina)
 
+@app.route("/criar_conta")
+def criar_conta():
+    email_id = request.args.get('ver')
+    code = request.args.get('c')
+    #pagina = "criar_conta"
+    return render_template("criar_conta.html", base_url=base_url, ver=email_id, c=code)
+
+@app.route("/verificar_email")
+def verificar_email():
+    #pagina = "criar_conta"
+    return render_template("verif_email.html", base_url=base_url)#pagina=pagina
+
+@app.route("/validar_email")
+def validar_email():
+    email_id = request.args.get('ver')
+    #pagina = "validar_email"
+    return render_template("validar_email.html", base_url=base_url, ver=email_id)
+
 app.static_folder = 'templates/assets'
 
 if __name__ == "__main__":

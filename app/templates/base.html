@@ -109,111 +109,119 @@
       </script>
       
 
-      
-    <div class="d-flex flex-row flex-grow-1">
-      <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 100vh; position: fixed;">
-        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-          <img src="{{ url_for('static', filename='images/Logo EleveCom redondo 1000x.png') }}" alt="" width="40" height="40" class="rounded-circle me-2">
-          <span class="fs-4">EleveCom</span>
-        </a>
-        <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-          <li class="nav-item">
-            {% if pagina == 'graficos' %}
-              <a href="/graficos" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-                Gráficos
+    <div class="main" style="display: flex; flex-direction: column; height: 100vh;">
+      <div class="d-flex flex-row flex-grow-1">
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px; height: 97vh; position: fixed;">
+          <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <img src="{{ url_for('static', filename='images/Logo EleveCom redondo 1000x.png') }}" alt="" width="40" height="40" class="rounded-circle me-2">
+            <span class="fs-4">EleveCom</span>
+          </a>
+          <hr>
+          <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+              {% if pagina == 'graficos' %}
+                <a href="/graficos" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                  Gráficos
+                </a>
+              {% else %}
+                <a href="/graficos" class="nav-link text-white">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                  Gráficos
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              {% if pagina == 'produtos' %}
+                <a href="/produtos" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                  Produtos
+                </a>
+              {% else %}
+                <a href="/produtos" class="nav-link text-white">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                  Produtos
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              {% if pagina == 'anuncios' %}
+                <a href="/anuncios" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                  Anúncios
+                </a>
+              {% else %}
+                <a href="/anuncios" class="nav-link text-white">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                  Anúncios
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              {% if pagina == 'analise_mercado' %}
+                <a href="/analise_mercado" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                  Análise de mercado
+                </a>
+              {% else %}
+                <a href="/analise_mercado" class="nav-link text-white">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                  Análise de mercado
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              {% if pagina == 'conta' %}
+                <a href="/conta" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                  Conta
+                </a>
+              {% else %}
+                <a href="/conta" class="nav-link text-white">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                  Conta
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              {% if pagina == 'administracao' %}
+                <a href="/administracao" class="nav-link active">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                  Administração
+                </a>
+              {% else %}
+                <a href="/administracao" class="nav-link disabled">
+                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                  Administração
+                </a>
+              {% endif %}
+            </li>
+            <li>
+              <a href="/" class="nav-link text-white" onclick="setCookie('token', 'aaa')">
+                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/sair"></use></svg>
+                Sair
               </a>
-            {% else %}
-              <a href="/graficos" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-                Gráficos
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            {% if pagina == 'produtos' %}
-              <a href="/produtos" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-                Produtos
-              </a>
-            {% else %}
-              <a href="/produtos" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-                Produtos
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            {% if pagina == 'anuncios' %}
-              <a href="/anuncios" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-                Anúncios
-              </a>
-            {% else %}
-              <a href="/anuncios" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-                Anúncios
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            {% if pagina == 'analise_mercado' %}
-              <a href="/analise_mercado" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-                Análise de mercado
-              </a>
-            {% else %}
-              <a href="/analise_mercado" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-                Análise de mercado
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            {% if pagina == 'conta' %}
-              <a href="/conta" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-                Conta
-              </a>
-            {% else %}
-              <a href="/conta" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-                Conta
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            {% if pagina == 'administracao' %}
-              <a href="/administracao" class="nav-link active">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-                Administração
-              </a>
-            {% else %}
-              <a href="/administracao" class="nav-link disabled">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-                Administração
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            <a href="/" class="nav-link text-white" onclick="setCookie('token', 'aaa')">
-              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/sair"></use></svg>
-              Sair
-            </a>
-          </li>
-        </ul>
-        <hr>
-        <div>
-          <img src="{{ url_for('static', filename='images/Logo EleveCom redondo 1000x.png') }}" alt="" width="32" height="32" class="rounded-circle me-2">
-          <strong>Conta</strong>
+            </li>
+          </ul>
+          <hr>
+          <div>
+            <img src="{{ url_for('static', filename='images/Logo EleveCom redondo 1000x.png') }}" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>Conta</strong>
+          </div>
+        </div>
+
+        <div style="width: 280px; min-width: 280px; max-width: 280px;"></div>
+        <div class="flex-grow-1" style="padding: 10px;">
+          {% block body %}{% endblock %}
         </div>
       </div>
 
-      <div style="width: 280px; min-width: 280px; max-width: 280px;"></div>
-      <div class="flex-grow-1" style="padding: 10px;">
-        {% block body %}{% endblock %}
+      <div id="aviso-dev" style="height: 3vh; position: fixed; margin-top: 97vh; background-color: yellow; width: 100%; display: flex; justify-content: center; align-items: center;">
+        <div>
+          <strong>Essa plataforma está em fase de desenvolvimento com teste grátis, erros e quedas poderão ocorrer durante seu uso!</strong>
+        </div>
       </div>
+
     </div>
 
   </body>

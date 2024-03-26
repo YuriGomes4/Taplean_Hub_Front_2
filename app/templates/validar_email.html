@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--
+Template Name: NobleUI - HTML Bootstrap 5 Admin Dashboard Template
+Author: NobleUI
+Website: https://www.nobleui.com
+Portfolio: https://themeforest.net/user/nobleui/portfolio
+Contact: nobleui123@gmail.com
+Purchase: https://1.envato.market/nobleui_admin
+License: For each use you must have a valid license purchased only from above link in order to legally use the theme for your project.
+-->
+<html lang="en">
+  <head><script src="{{ url_for('static', filename='js/color-modes.js') }}"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.122.0">
+    <title>Signin Template · Bootstrap v5.3</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
+
+    
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+
+<link href="{{ url_for('static', filename='dist/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='dist/css/sign-in.css') }}" rel="stylesheet">
+
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+  </head>
+<body>
+	<div class="main-wrapper" style="display: flex;">
+		<div class="page-wrapper full-page" style="display: flex; flex-direction: column; width: 100%; min-height: 97vh;">
+			<div class="page-content d-flex align-items-center justify-content-center" style="flex-grow: 1; padding: 25px;">
+
+				<div class="row w-100 mx-0 auth-page">
+					<div class="col-md-8 col-xl-6 mx-auto">
+						<div class="card">
+							<div class="row">
+                <div class="col-md-4 pe-md-0">
+                  <div class="auth-side-wrapper" style="width: 100%; height: 100%; background-image: url(https://via.placeholder.com/219x452); background-size: cover;">
+
+                  </div>
+                </div>
+                <div class="col-md-8 ps-md-0">
+                  <div class="auth-form-wrapper px-4 py-5">
+                    <span>EleveCom</span>
+                    <h5 class="text-muted fw-normal mb-4">Crie gratuitamente sua conta.</h5>
+                    <form class="forms-sample">
+                      <div class="mb-3">
+                        <label for="userCodigo" class="form-label">Código enviado no email</label>
+                        <input type="email" class="form-control" id="userCodigo" placeholder="Código">
+                      </div>
+                      <div>
+                        <button type="button" class="btn btn-primary btn-icon-text mb-2 mb-md-0" onclick="validarEmail()">
+                            Validar email
+                        </button>
+                      </div>
+                      <a href="login" class="d-block mt-3 text-muted">Já tem conta? Entre</a>
+                    </form>
+                  </div>
+                </div>
+              </div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- core:js -->
+    
+    <script src="{{ url_for('static', filename='vendors/core/core.js') }}"></script>
+    <!-- endinject -->
+    
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    
+    <!-- inject:js -->
+    <script src="{{ url_for('static', filename='vendors/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+	<!-- endinject -->
+
+	<!-- Custom js for this page -->
+    <script>
+        function validarEmail() {
+            var codigo = document.getElementById("userCodigo").value;
+
+            var xhr = new XMLHttpRequest();
+            //var email = document.getElementById("userEmail").value;
+            xhr.open("POST", "{{ base_url }}/api/v1/conta/verif_email?email_id={{ ver }}&code=" + codigo, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        window.location.href = "criar_conta?ver={{ ver }}&c=" + response.result;
+                    }
+                }
+            }
+            xhr.send();
+        }
+    </script>
+	<!-- End custom js for this page -->
+
+  <div id="aviso-dev" style="height: 3vh; position: fixed; background-color: yellow; width: 100%; display: flex; justify-content: center; align-items: center;">
+    <div>
+      <strong style="color: black;">Essa plataforma está em fase de desenvolvimento com teste grátis, erros e quedas poderão ocorrer durante seu uso!</strong>
+    </div>
+  </div>
+
+</body>
+</html>
