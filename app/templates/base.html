@@ -85,7 +85,8 @@
 
         var xhr2 = new XMLHttpRequest();
         xhr2.open("GET", "{{ base_url }}/api/v1/usuario/preferences", true);
-        xhr2.setRequestHeader("x-access-token", token);
+        xhr2.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhr2.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
         xhr2.onreadystatechange = function() {
           if (xhr2.readyState === 4) {
             if (xhr2.status === 200) {
