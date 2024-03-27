@@ -38,6 +38,7 @@
     <script>
       function setCookie(name, value) {
           document.cookie = name + "=" + value;
+          //sessionStorage.setItem(name, value);
       }
 
       function getCookie(name) {
@@ -105,6 +106,20 @@
         };
         xhr2.send();
         // Cookie does not exist, do something else
+      }
+      function logout() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '{{ base_url }}/api/auth/logout', true);
+        xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    window.location.href = '/';
+                }
+            }
+        };
+        xhr.send();
       }
       </script>
       
@@ -197,7 +212,7 @@
               {% endif %}
             </li>
             <li>
-              <a href="/" class="nav-link text-white" onclick="setCookie('token', 'token')">
+              <a href="/" class="nav-link text-white" onclick="logout()">
                 <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/sair"></use></svg>
                 Sair
               </a>

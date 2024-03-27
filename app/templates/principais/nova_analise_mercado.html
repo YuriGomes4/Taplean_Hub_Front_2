@@ -85,7 +85,8 @@
 
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{{ base_url }}/api/v1/pesquisa_mercado", true);
-            xhr.setRequestHeader("x-access-token", getCookie("token"));
+            xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+            xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {

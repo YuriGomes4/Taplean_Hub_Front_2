@@ -191,15 +191,18 @@
 
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "{{ base_url }}/api/auth/login", true);
+        xhr.setRequestHeader("x-session-id", "{{ session_id }}");
+        xhr.setRequestHeader("x-remote-adr", "{{ remote_adr }}");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function() {
           if (xhr.readyState === 4) {
             if (xhr.status === 201) {
               // Requisição bem sucedida
               //console.error(xhr.responseText);
-              var responseJson = JSON.parse(xhr.responseText); // Parse the response as JSON
-              var token = responseJson.token; // Get the value of 'token'
-              document.cookie = "token=" + token; // Set the cookie
+              //var responseJson = JSON.parse(xhr.responseText); // Parse the response as JSON
+              //var token = responseJson.token; // Get the value of 'token'
+              //document.cookie = "token=" + token; // Set the cookie
+              //sessionStorage.setItem("token", token); // Set the session storage
               window.location.href = "/"; // Redirect to the home page
             } else {
             // Ocorreu um erro na requisição

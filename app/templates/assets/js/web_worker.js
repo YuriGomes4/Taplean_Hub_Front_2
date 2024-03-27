@@ -2,13 +2,13 @@
 addEventListener('message', function(e) {
     var dados = e.data;
     if ( dados.funcao == "add_products" ) {
-        add_products(dados.valor[0], dados.valor[1], dados.valor[2]); // Chama uma função demorada
+        add_products(dados.valor[0], dados.valor[1], dados.valor[2], dados.valor[3]); // Chama uma função demorada
         //postMessage({ resultado:ret }); // Manda o resultado como mensagem
     }
     // Outras funções, se aplicável
 });
 
-function add_products(produtos, token, base_url) {
+function add_products(produtos, session_id, remote_adr, base_url) {
     //var tr = document.createElement("tr");
 
     for (var produto in produtos) {
@@ -16,7 +16,8 @@ function add_products(produtos, token, base_url) {
 
         var xhrp = new XMLHttpRequest();
         xhrp.open("GET", base_url+"/api/v1/meli/anuncio/"+itemId+"?range_vendas=true&visitas=30", false);
-        xhrp.setRequestHeader("x-access-token", token);
+        xhrp.setRequestHeader('x-session-id', session_id);
+        xhrp.setRequestHeader('x-remote-adr', remote_adr);;
         xhrp.onreadystatechange = function() {
             if (xhrp.readyState === 4 && xhrp.status === 200) {
                 var response = JSON.parse(xhrp.responseText).result;

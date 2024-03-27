@@ -25,7 +25,8 @@
 <script>
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "{{ base_url }}/api/v1/anuncio", true);
-    xhr.setRequestHeader("x-access-token", getCookie("token"));
+    xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+    xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var response = JSON.parse(xhr.responseText).result;

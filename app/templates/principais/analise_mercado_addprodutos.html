@@ -22,7 +22,8 @@
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
-    xhr.setRequestHeader('x-access-token', getCookie('token'));
+    xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+    xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -150,7 +151,8 @@
                     xhr.open("GET", "{{ base_url }}/api/v1/meli/categoria?id="+categId, true);
                 }
                 //xhr.open("GET", "{{ base_url }}/api/v1/meli/categoria?id="+categId, true);
-                xhr.setRequestHeader("x-access-token", getCookie("token"));
+                xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+                xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         // Manipulate response data here
@@ -278,7 +280,8 @@
 
             var xhrlk = new XMLHttpRequest();
             xhrlk.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pegarmlb?link="+link, true);
-            xhrlk.setRequestHeader("x-access-token", getCookie("token"));
+            xhrlk.setRequestHeader('x-session-id', '{{ session_id }}');
+            xhrlk.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
             xhrlk.onreadystatechange = function() {
                 if (xhrlk.readyState === 4) {
                     if (xhrlk.status === 200){
@@ -366,7 +369,8 @@
         var xhrap = new XMLHttpRequest();
         xhrap.open("POST", "{{ base_url }}/api/v1/pesquisa_mercado/anuncios?pesquisa={{ id_pesquisa }}", true);
         xhrap.setRequestHeader("Content-Type", "application/json");
-        xhrap.setRequestHeader("x-access-token", getCookie("token"));
+        xhrap.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhrap.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
         xhrap.onreadystatechange = function() {
             if (xhrap.readyState === 4 && xhrap.status === 200) {
                 var response = JSON.parse(xhrap.responseText).result;
@@ -436,7 +440,8 @@
                 xhr.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pesquisar?q="+document.getElementById("input_search").value, true);
             }
             //xhr.open("GET", "{{ base_url }}/api/v1/pesquisa_mercado/maisvendidos/"+valor+"?pesquisa={{ id_pesquisa }}", true);
-            xhr.setRequestHeader("x-access-token", getCookie("token"));
+            xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+            xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var response = JSON.parse(xhr.responseText).result;
@@ -450,7 +455,7 @@
 
 
                     //add_products(produtos);
-                    worker.postMessage({ funcao:"add_products", valor:[produtos, getCookie("token"), "{{ base_url }}"] }); // assíncrono - retorna imediatamente
+                    worker.postMessage({ funcao:"add_products", valor:[produtos, '{{ session_id }}', '{{ remote_adr }}', "{{ base_url }}"] }); // assíncrono - retorna imediatamente
 
 
                     loading.remove();

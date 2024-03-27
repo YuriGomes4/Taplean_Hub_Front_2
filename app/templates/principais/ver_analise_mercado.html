@@ -62,7 +62,8 @@
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
-        xhr.setRequestHeader('x-access-token', getCookie('token'));
+        xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
@@ -143,7 +144,8 @@
 
                             var xhr2 = new XMLHttpRequest();
                             xhr2.open('GET', '{{ base_url }}/api/v1/meli/categoria?id='+cat_ids.join(','), true);
-                            xhr2.setRequestHeader('x-access-token', getCookie('token'));
+                            xhr2.setRequestHeader('x-session-id', '{{ session_id }}');
+                            xhr2.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
                             xhr2.onreadystatechange = function() {
                                 if (xhr2.readyState === 4) {
                                     if (xhr2.status === 200) {
@@ -385,7 +387,8 @@
         var xhr = new XMLHttpRequest();
         xhr.open('PUT', '{{ base_url }}/api/v1/pesquisa_mercado?pesquisa={{ id_pesquisa }}', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('x-access-token', getCookie('token'));
+        xhr.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhr.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {

@@ -112,7 +112,8 @@
 
         var xhrl = new XMLHttpRequest();
         xhrl.open("GET", "{{ base_url }}/api/v1/meli/anuncio/pegarmlb?link="+link, true);
-        xhrl.setRequestHeader("x-access-token", getCookie("token"));
+        xhrl.setRequestHeader('x-session-id', '{{ session_id }}');
+        xhrl.setRequestHeader('x-remote-adr', '{{ remote_adr }}');;
         xhrl.onreadystatechange = function() {
             if (xhrl.readyState === 4 && xhrl.status === 200) {
                 var response = JSON.parse(xhrl.responseText).result;
@@ -123,7 +124,8 @@
 
                 var xhra = new XMLHttpRequest();
                 xhra.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+mlb+"?range_vendas=True&categoria=True&termo="+termo, true);
-                xhra.setRequestHeader("x-access-token", getCookie("token"));
+                xhra.setRequestHeader('x-session-id', '{{ session_id }}');
+                xhra.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
                 xhra.onreadystatechange = function() {
                     if (xhra.readyState === 4 && xhra.status === 200) {
                         var response = JSON.parse(xhra.responseText).result;
@@ -369,7 +371,8 @@
 
                         var xhrvs = new XMLHttpRequest();
                         xhrvs.open("GET", "{{ base_url }}/api/v1/meli/anuncio/"+mlb+"/grafico?tipo=visitas", true);
-                        xhrvs.setRequestHeader("x-access-token", getCookie("token"));
+                        xhrvs.setRequestHeader('x-session-id', '{{ session_id }}');
+                        xhrvs.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
                         xhrvs.onreadystatechange = function() {
                             if (xhrvs.readyState === 4) {
                                 if (xhrvs.status === 200) {
@@ -530,7 +533,8 @@
 
                         var xhrven = new XMLHttpRequest();
                         xhrven.open("GET", "{{ base_url }}/api/v1/meli/vendedor/"+anuncio.seller_id, true);
-                        xhrven.setRequestHeader("x-access-token", getCookie("token"));
+                        xhrven.setRequestHeader('x-session-id', '{{ session_id }}');
+                        xhrven.setRequestHeader('x-remote-adr', '{{ remote_adr }}');
                         xhrven.onreadystatechange = function() {
                             if (xhrven.readyState === 4) {
                                 if (xhrven.status === 200) {
