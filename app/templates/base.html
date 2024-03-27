@@ -134,81 +134,93 @@
           <hr>
           <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-              {% if pagina == 'graficos' %}
-                <a href="/graficos" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-                  Gráficos
-                </a>
-              {% else %}
-                <a href="/graficos" class="nav-link text-white">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
-                  Gráficos
-                </a>
+              {% if permissoes.graficos.acessar == true %}
+                {% if pagina == 'graficos' %}
+                  <a href="/graficos" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                    Gráficos
+                  </a>
+                {% else %}
+                  <a href="/graficos" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/graficos"></use></svg>
+                    Gráficos
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
-              {% if pagina == 'produtos' %}
-                <a href="/produtos" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-                  Produtos
-                </a>
-              {% else %}
-                <a href="/produtos" class="nav-link text-white">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
-                  Produtos
-                </a>
+              {% if permissoes.produtos.acessar == true %}
+                {% if pagina == 'produtos' %}
+                  <a href="/produtos" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                    Produtos
+                  </a>
+                {% else %}
+                  <a href="/produtos" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/produtos"></use></svg>
+                    Produtos
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
-              {% if pagina == 'anuncios' %}
-                <a href="/anuncios" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-                  Anúncios
-                </a>
-              {% else %}
-                <a href="/anuncios" class="nav-link text-white">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
-                  Anúncios
-                </a>
+              {% if permissoes.anuncios.acessar == true %}
+                {% if pagina == 'anuncios' %}
+                  <a href="/anuncios" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                    Anúncios
+                  </a>
+                {% else %}
+                  <a href="/anuncios" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/anuncios"></use></svg>
+                    Anúncios
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
-              {% if pagina == 'analise_mercado' %}
-                <a href="/analise_mercado" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-                  Análise de mercado
-                </a>
-              {% else %}
-                <a href="/analise_mercado" class="nav-link text-white">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
-                  Análise de mercado
-                </a>
+              {% if permissoes.analise_mercado.acessar == true %}
+                {% if pagina == 'analise_mercado' %}
+                  <a href="/analise_mercado" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                    Análise de mercado
+                  </a>
+                {% else %}
+                  <a href="/analise_mercado" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/analise_mercado"></use></svg>
+                    Análise de mercado
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
-              {% if pagina == 'conta' %}
-                <a href="/conta" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-                  Conta
-                </a>
-              {% else %}
-                <a href="/conta" class="nav-link text-white">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
-                  Conta
-                </a>
+              {% if permissoes.conta.acessar == true %}
+                {% if pagina == 'conta' %}
+                  <a href="/conta" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                    Conta
+                  </a>
+                {% else %}
+                  <a href="/conta" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/conta"></use></svg>
+                    Conta
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
-              {% if pagina == 'administracao' %}
-                <a href="/administracao" class="nav-link active">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-                  Administração
-                </a>
-              {% else %}
-                <a href="/administracao" class="nav-link disabled">
-                  <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
-                  Administração
-                </a>
+              {% if permissoes.administracao.acessar == true %}
+                {% if pagina == 'administracao' %}
+                  <a href="/administracao" class="nav-link active">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                    Administração
+                  </a>
+                {% else %}
+                  <a href="/administracao" class="nav-link disabled">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="/administracao"></use></svg>
+                    Administração
+                  </a>
+                {% endif %}
               {% endif %}
             </li>
             <li>
