@@ -103,6 +103,21 @@
     <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
   </head>
   <body class="d-flex align-items-center py-4 bg-body-tertiary">
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="liveToast" class="toast fade showing" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <img src="{{ url_for('static', filename='images/Logo EleveCom redondo 1000x.png') }}" class="rounded me-2" alt="logo elevecom" width="20" height="20">
+          <strong id="toast_titulo" class="me-auto">Bootstrap</strong>
+          <small id="toast_tempo">11 mins ago</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="toast_mensagem" class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+      </div>
+    </div>
+
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -185,6 +200,28 @@
     </main>
     <script src="{{ url_for('static', filename='dist/js/bootstrap.bundle.min.js') }}"></script>
     <script>
+      function toast(titulo, mensagem, tempo) {
+        var toast = document.getElementById('liveToast');
+        var toast_titulo = document.getElementById('toast_titulo');
+        var toast_mensagem = document.getElementById('toast_mensagem');
+        var toast_tempo = document.getElementById('toast_tempo');
+        toast_titulo.textContent = titulo;
+        toast_mensagem.textContent = mensagem;
+        toast_tempo.textContent = tempo;
+        
+        toast.classList.add('show');
+        setTimeout(function() {
+          toast.classList.remove('showing');
+        }, 100);
+        // esperar 5 segundos
+        setTimeout(function() {
+          toast.classList.add('showing');
+          setTimeout(function() {
+            toast.classList.remove('show');
+          }, 100);
+        }, 5000);
+      }
+
       function login() {
         var email = document.getElementById("floatingInput").value;
         var password = document.getElementById("floatingPassword").value;
@@ -205,9 +242,13 @@
               //sessionStorage.setItem("token", token); // Set the session storage
               window.location.href = "/"; // Redirect to the home page
             } else {
-            // Ocorreu um erro na requisição
-            console.error('Erro:', xhr.status);
-            // console.error(xhr.responseText);
+              if (xhr.status === 401) {
+                toast('Erro', 'Todos os campos precisam ser preenchidos', 'Agora');
+              } else if (xhr.status === 403) {
+                toast('Erro', 'Email ou senha incorretos!', 'Agora');
+              } else {
+                toast('Erro', 'Erro desconhecido!', 'Agora');
+              }
             }
           }
         };

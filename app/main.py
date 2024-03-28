@@ -244,7 +244,7 @@ def administracao(session_id, remote_adr, permissoes):
     return render_template("principais/administracao.html", base_url=base_url, pagina=pagina, session_id=session_id, remote_adr=remote_adr, permissoes=permissoes)
 
 @app.route("/criar_conta")
-def criar_conta(session_id, remote_adr, permissoes):
+def criar_conta():
     email_id = request.args.get('ver')
     code = request.args.get('c')
     #pagina = "criar_conta"
